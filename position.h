@@ -7,6 +7,17 @@
 #define WHITE true
 #define BLACK false
 
+enum {
+        A8=0, B8, C8, D8, E8, F8, G8, H8,
+        A7, B7, C7, D7, E7, F7, G7, H7,
+        A6, B6, C6, D6, E6, F6, G6, H6,
+        A5, B5, C5, D5, E5, F5, G5, H5,
+        A4, B4, C4, D4, E4, F4, G4, H4,
+        A3, B3, C3, D3, E3, F3, G3, H3,
+        A2, B2, C2, D2, E2, F2, G2, H2,
+        A1, B1, C1, D1, E1, F1, G1, H1
+    };
+
 /**
  * Store all information associated with a single chess position.
 */
@@ -27,32 +38,27 @@ private:
     bool side_to_move_; // using defined constants WHITE or BLACK
     // 64 bit integers store a single piece of informatio for each square
     // on the board. By combining bitboards you can store the full position.
+    struct PieceBitboards {
+            uint64_t occupied_squares;
+            uint64_t king;
+            uint64_t queen;
+            uint64_t rooks;
+            uint64_t knights;
+            uint64_t bishops;
+            uint64_t pawns;
+        };
     struct BitBoard {
         uint64_t en_passante;
         uint64_t all_occupied_squares;
-        struct White {
-            uint64_t occupied_squares;
-            uint64_t king;
-            uint64_t queen;
-            uint64_t rooks;
-            uint64_t knights;
-            uint64_t bishops;
-            uint64_t pawns;
-        } white;
-        struct Black {
-            uint64_t occupied_squares;
-            uint64_t king;
-            uint64_t queen;
-            uint64_t rooks;
-            uint64_t knights;
-            uint64_t bishops;
-            uint64_t pawns;
-        } black;
+        PieceBitboards white;
+        PieceBitboards black;
     } bitboard;
 public:
     Position();
     void SetStartingPosition();
     void UpdatePosition(Move& move);
+    void UpdatePieceBitboard(Move& move, struct PieceBitboards *piece_bitboards);
+
     uint64_t GetAllOccupiedSquaresBitBoard() {return bitboard.all_occupied_squares;}
 
     uint64_t GetWhiteOccupiedSquaresBitBoard() {return bitboard.white.occupied_squares;}
@@ -71,6 +77,13 @@ public:
     uint64_t GetBlackKnightsBitBoard() {return bitboard.black.knights;}
     uint64_t GetBlackBishopsBitBoard() {return bitboard.black.bishops;}
     uint64_t GetBlackPawnsBitBoard() {return bitboard.black.pawns;}
+
+    uint64_t GetKingBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.king;}
+    uint64_t GetQueenBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.queen;}
+    uint64_t GetRooksBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.rooks;}
+    uint64_t GetKnightsBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.knights;}
+    uint64_t GetBishopsBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.bishops;}
+    uint64_t GetPawnsBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.pawns;}
     
     uint64_t GetEnPassanteBitBoard() {return bitboard.en_passante;}
     bool GetSideToMove() {return side_to_move_;}
