@@ -50,42 +50,34 @@ private:
     struct BitBoard {
         uint64_t en_passante;
         uint64_t all_occupied_squares;
-        PieceBitboards white;
-        PieceBitboards black;
+        PieceBitboards piece_bitboards [2];
     } bitboard;
 public:
     Position();
     void SetStartingPosition();
     void UpdatePosition(Move& move);
-    void UpdatePieceBitboard(Move& move, struct PieceBitboards *piece_bitboards);
+    void UpdatePieceBitboard(Move& move, struct PieceBitboards &piece_bitboards);
 
     uint64_t GetAllOccupiedSquaresBitBoard() {return bitboard.all_occupied_squares;}
-
-    uint64_t GetWhiteOccupiedSquaresBitBoard() {return bitboard.white.occupied_squares;}
-    uint64_t GetBlackOccupiedSquaresBitBoard() {return bitboard.black.occupied_squares;}
-
-    uint64_t GetWhiteKingBitBoard() {return bitboard.white.king;}
-    uint64_t GetWhiteQueenBitBoard() {return bitboard.white.queen;}
-    uint64_t GetWhiteRooksBitBoard() {return bitboard.white.rooks;}
-    uint64_t GetWhiteKnightsBitBoard() {return bitboard.white.knights;}
-    uint64_t GetWhiteBishopsBitBoard() {return bitboard.white.bishops;}
-    uint64_t GetWhitePawnsBitBoard() {return bitboard.white.pawns;}
-
-    uint64_t GetBlackKingBitBoard() {return bitboard.black.king;}
-    uint64_t GetBlackQueenBitBoard() {return bitboard.black.queen;}
-    uint64_t GetBlackRooksBitBoard() {return bitboard.black.rooks;}
-    uint64_t GetBlackKnightsBitBoard() {return bitboard.black.knights;}
-    uint64_t GetBlackBishopsBitBoard() {return bitboard.black.bishops;}
-    uint64_t GetBlackPawnsBitBoard() {return bitboard.black.pawns;}
-
-    uint64_t GetKingBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.king;}
-    uint64_t GetQueenBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.queen;}
-    uint64_t GetRooksBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.rooks;}
-    uint64_t GetKnightsBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.knights;}
-    uint64_t GetBishopsBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.bishops;}
-    uint64_t GetPawnsBitBoard(struct PieceBitboards piece_bitboard) {return piece_bitboard.pawns;}
-    
     uint64_t GetEnPassanteBitBoard() {return bitboard.en_passante;}
+
+    uint64_t GetOccupiedSquaresBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].occupied_squares;}
+
+    uint64_t GetKingBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].king;}
+    uint64_t GetQueenBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].queen;}
+    uint64_t GetRooksBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].rooks;}
+    uint64_t GetKnightsBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].knights;}
+    uint64_t GetBishopsBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].bishops;}
+    uint64_t GetPawnsBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].pawns;}
+
+    void SetKingBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].king = new_bitboard; }
+    void SetQueenBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].queen = new_bitboard; }
+    void SetRooksBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].rooks = new_bitboard; }
+    void SetKnightsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].knights = new_bitboard; }
+    void SetBishopsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].bishops = new_bitboard; }
+    void SetPawnsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].pawns = new_bitboard; }
+    
+    
     bool GetSideToMove() {return side_to_move_;}
     bool GetWhiteCanCastleKingSideFlag() {return white_can_castle_king_side_;}
     bool GetWhiteCanCastleQueenSideFlag() {return white_can_castle_queen_side_;}
