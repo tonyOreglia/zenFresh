@@ -2,6 +2,8 @@
 #define POSITION_H
 
 #include <cstdint>
+#include <bitset>
+#include <iostream>
 #include "move.h"
 
 #define WHITE true
@@ -24,7 +26,7 @@ enum {
 class Position
 {
 private:
-    uint64_t UpdateAllOccupiedSquaresBitBoard();
+    uint64_t UpdateAggregateBitboardsFromPieceBitboards();
     uint64_t UpdateAllWhiteOccupiedSquaresBitBoard();
     uint64_t UpdateAllBlackOccupiedSquaresBitBoard();
     bool white_can_castle_king_side_;
@@ -55,8 +57,8 @@ private:
 public:
     Position();
     void SetStartingPosition();
-    void UpdatePosition(Move& move);
-    void UpdatePieceBitboard(Move& move, struct PieceBitboards &piece_bitboards);
+    void UpdatePositionWithSingleMove(Move& move);
+    void UpdateAllBitboardsWithSingleMove(Move& move);
 
     uint64_t GetAllOccupiedSquaresBitBoard() {return bitboard.all_occupied_squares;}
     uint64_t GetEnPassanteBitBoard() {return bitboard.en_passante;}
@@ -77,7 +79,6 @@ public:
     void SetBishopsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].bishops = new_bitboard; }
     void SetPawnsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].pawns = new_bitboard; }
     
-    
     bool GetSideToMove() {return side_to_move_;}
     bool GetWhiteCanCastleKingSideFlag() {return white_can_castle_king_side_;}
     bool GetWhiteCanCastleQueenSideFlag() {return white_can_castle_queen_side_;}
@@ -85,6 +86,8 @@ public:
     bool GetBlackCanCastleQueenSideFlag() {return black_can_castle_queen_side_;}
     uint8_t GetHalfMoveCount() {return half_move_count_;}
     short int GetFullMoveCount() {return full_move_count_;}
+
+    void PrintBitBoard(uint64_t);
 };
 
 #endif

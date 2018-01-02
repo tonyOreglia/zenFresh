@@ -22,7 +22,8 @@ int main(int argc, char *argv[]) {
     move.SetOriginSquare(E2);
     move.SetDestinationSquare(E4);
     move.SetDoublePawnPushFlag();
-    PrintMove(move);
+    position.UpdatePositionWithSingleMove(move);
+    PrintHumanReadableBoard(position);
     return 0;
 }
 

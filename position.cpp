@@ -2,7 +2,7 @@
 
 Position::Position()
 {
-    this->SetStartingPosition();
+    SetStartingPosition();
 }
 
 /**
@@ -34,7 +34,7 @@ void Position::SetStartingPosition() {
     full_move_count_ = 0;
     side_to_move_ = WHITE;
 
-    this->UpdateAllOccupiedSquaresBitBoard();
+    UpdateAggregateBitboardsFromPieceBitboards();
 }
 
 /**
@@ -44,35 +44,29 @@ void Position::SetStartingPosition() {
  * @param (PieceBitboards&) Reference to struct containing bitboards representing the location
  * of each piece type for the color whose turn it is.
 */
-void Position::UpdatePieceBitboard(Move& move, struct PieceBitboards &moving_sides_struct_containing_piece_bitboards) {
+void Position::UpdateAllBitboardsWithSingleMove(Move& move) {
     uint64_t origin_square_mask = 1ULL << move.GetOriginSquare();
     uint64_t destination_square_mask = 1ULL << move.GetDestinationSquare();
-    uint64_t moving_sides_piece_bitboard = GetKingBitBoard(moving_sides_struct_containing_piece_bitboards);
-
-    if (moving_sides_piece_bitboard & origin_square_mask) {
-        moving_sides_piece_bitboard ^= origin_square_mask & destination_square_mask;
-
+    
+    if (GetKingBitBoard(side_to_move_) & origin_square_mask) {
+        bitboard.piece_bitboards[side_to_move_].king ^= (origin_square_mask | destination_square_mask);
     }
-    moving_sides_piece_bitboard = this->GetQueenBitBoard(moving_sides_struct_containing_piece_bitboards);
-    if (moving_sides_piece_bitboard & origin_square_mask) {
-       moving_sides_piece_bitboard ^= origin_square_mask & destination_square_mask;
+    else if (GetQueenBitBoard(side_to_move_) & origin_square_mask) {
+        bitboard.piece_bitboards[side_to_move_].queen ^= (origin_square_mask | destination_square_mask);
     }
-    moving_sides_piece_bitboard = this->GetRooksBitBoard(moving_sides_struct_containing_piece_bitboards);
-    if (moving_sides_piece_bitboard & origin_square_mask) {
-        moving_sides_piece_bitboard ^= origin_square_mask & destination_square_mask;
+    else if (GetRooksBitBoard(side_to_move_) & origin_square_mask) {
+        bitboard.piece_bitboards[side_to_move_].rooks ^= (origin_square_mask | destination_square_mask);
     }
-    moving_sides_piece_bitboard = this->GetBishopsBitBoard(moving_sides_struct_containing_piece_bitboards);
-    if (moving_sides_piece_bitboard & origin_square_mask) {
-        moving_sides_piece_bitboard ^= origin_square_mask & destination_square_mask;
+    else if (GetBishopsBitBoard(side_to_move_) & origin_square_mask) {
+       bitboard.piece_bitboards[side_to_move_].bishops ^= (origin_square_mask | destination_square_mask);
     }
-    moving_sides_piece_bitboard = this->GetKnightsBitBoard(moving_sides_struct_containing_piece_bitboards);
-    if (moving_sides_piece_bitboard & origin_square_mask) {
-        moving_sides_piece_bitboard ^= origin_square_mask & destination_square_mask;
+    else if (GetKnightsBitBoard(side_to_move_) & origin_square_mask) {
+        bitboard.piece_bitboards[side_to_move_].knights ^= (origin_square_mask | destination_square_mask);
     }
-    moving_sides_piece_bitboard = this->GetPawnsBitBoard(moving_sides_struct_containing_piece_bitboards);
-    if (moving_sides_piece_bitboard & origin_square_mask) {
-        moving_sides_piece_bitboard ^= origin_square_mask & destination_square_mask;
+    else if (GetPawnsBitBoard(side_to_move_) & origin_square_mask) {
+        bitboard.piece_bitboards[side_to_move_].pawns ^= (origin_square_mask | destination_square_mask);
     }
+    UpdateAggregateBitboardsFromPieceBitboards();
 }
 
 /**
@@ -80,18 +74,8 @@ void Position::UpdatePieceBitboard(Move& move, struct PieceBitboards &moving_sid
  * 
  * @param (Move&) Reference to class representing a single chess move.
 */
-void Position::UpdatePosition(Move& move) {
-    struct PieceBitboards piece_bitboards;
-    if (GetSideToMove() == WHITE) {
-        piece_bitboards = bitboard.white;
-    } else {
-        piece_bitboards = this->bitboard.black;
-    }
-    // update bitboards
-    /// Figure out which piece is moving
-    
-
-    // update castling, full move, half move counts, side to move
+void Position::UpdatePositionWithSingleMove(Move& move) {
+    UpdateAllBitboardsWithSingleMove(move);
 }
 
 /**
@@ -100,7 +84,7 @@ void Position::UpdatePosition(Move& move) {
  * and the bitboard representing each piece with a black piece.
  * Update is based on the underlying bitboards representing the location of each piece.
 */
-uint64_t Position::UpdateAllOccupiedSquaresBitBoard() {
+uint64_t Position::UpdateAggregateBitboardsFromPieceBitboards() {
     return bitboard.all_occupied_squares =
         this->UpdateAllWhiteOccupiedSquaresBitBoard() |
         this->UpdateAllBlackOccupiedSquaresBitBoard();
@@ -134,4 +118,15 @@ uint64_t Position::UpdateAllBlackOccupiedSquaresBitBoard() {
         bitboard.piece_bitboards[BLACK].knights |
         bitboard.piece_bitboards[BLACK].bishops |
         bitboard.piece_bitboards[BLACK].pawns;
+}
+
+void Position::PrintBitBoard(uint64_t bitboard) {
+    std::bitset<64> bb (bitboard);
+    for(int i=0;i<64;i++) {
+        std::cout << bb[i];
+        if(((i+1) % 8) == 0) 
+            std::cout << std::endl;
+    }
+    std::cout << std::endl;
+    std::cout << std::endl;
 }
