@@ -57,12 +57,12 @@ public:
 
     uint16_t GetOriginSquare() { return move >> 10; }
     uint16_t GetDestinationSquare() { return ( move & DESTINATION_MASK ) >> 4; }
-    bool GetDoublePawnPushFlag() { return (move & FLAGS_MASK) == 1; }
-    bool GetCaptureFlag() { return (bool)(move & CAPTURE_MASK); }
-    bool GetPromotionFlag() { return  (bool)(move & PROMOTION_MASK); }
-    bool GetKingSideCastleFlag() { return (move & FLAGS_MASK) == 2; }
-    bool GetQueenSideCastleFlag() { return (move & FLAGS_MASK) == 3; }
-    bool GetEnPassantCaptureFlag() { return (move & FLAGS_MASK) == 5; }
+    bool IsDoublePawnPush() { return (move & FLAGS_MASK) == 1; }
+    bool IsCapture() { return (bool)(move & CAPTURE_MASK); }
+    bool IsPromotion() { return  (bool)(move & PROMOTION_MASK); }
+    bool IsKingSideCastle() { return (move & FLAGS_MASK) == 2; }
+    bool IsQueenSideCastle() { return (move & FLAGS_MASK) == 3; }
+    bool IsEnPassantCapture() { return (move & FLAGS_MASK) == 5; }
     bool PromotePawnToQueen() { return (move & SPECIAL_1_2_MASK) == 3; }
     bool PromotePawnToRook() { return (move & SPECIAL_1_2_MASK) == 2; }
     bool PromotePawnToKnight() { return !(move & SPECIAL_1_2_MASK); }

@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 void PrintMove(Move& move) {
     cout << "origin square: " << move.GetOriginSquare() << endl;
     cout << "destination square: " << move.GetDestinationSquare() << endl;
-    if (move.GetDoublePawnPushFlag()) {
+    if (move.IsDoublePawnPush()) {
         cout << "This is a double pawn push\n";
     }
 }

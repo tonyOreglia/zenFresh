@@ -4,7 +4,10 @@
 #include <cstdint>
 #include <bitset>
 #include <iostream>
+#include <stack>
+
 #include "move.h"
+#include "generate-bitboard-lookup-tables.h"
 
 #define WHITE true
 #define BLACK false
@@ -37,7 +40,7 @@ private:
     // This is monitored to honour the fifty move rule.
     uint8_t half_move_count_;
     short int full_move_count_;
-    bool side_to_move_; // using defined constants WHITE or BLACK
+    bool side_to_move_; // using defined constants WHITE (true) or BLACK (false)
     // 64 bit integers store a single piece of informatio for each square
     // on the board. By combining bitboards you can store the full position.
     struct PieceBitboards {
@@ -54,17 +57,16 @@ private:
         uint64_t all_occupied_squares;
         PieceBitboards piece_bitboards [2];
     } bitboard;
+    std::stack<uint64_t*> captured_pieces;
 public:
     Position();
     void SetStartingPosition();
     void UpdatePositionWithSingleMove(Move& move);
-    void UpdateAllBitboardsWithSingleMove(Move& move);
+    void UpdateAllBitboardsWithSingleMove(uint16_t origin_sq, uint16_t destination_sq, bool side_to_update);
 
     uint64_t GetAllOccupiedSquaresBitBoard() {return bitboard.all_occupied_squares;}
     uint64_t GetEnPassanteBitBoard() {return bitboard.en_passante;}
-
     uint64_t GetOccupiedSquaresBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].occupied_squares;}
-
     uint64_t GetKingBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].king;}
     uint64_t GetQueenBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].queen;}
     uint64_t GetRooksBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].rooks;}
@@ -88,6 +90,8 @@ public:
     short int GetFullMoveCount() {return full_move_count_;}
 
     void PrintBitBoard(uint64_t);
+
+    BitBoardLookupTables bitboard_lookup;
 };
 
 #endif
