@@ -35,8 +35,6 @@ void PrintMove(Move& move) {
     }
 }
 
-
-
 void PrintBitBoard(uint64_t bitboard) {
     bitset<64> bb (bitboard);
     for(int i=0;i<64;i++) {

@@ -9,8 +9,12 @@
 #include "move.h"
 #include "generate-bitboard-lookup-tables.h"
 
-#define WHITE true
-#define BLACK false
+#define WHITE 1
+#define BLACK 0
+#define KING_SIDE_CASTLE 0
+#define QUEEN_SIDE_CASTLE 1
+
+using namespace std;
 
 enum {
         A8=0, B8, C8, D8, E8, F8, G8, H8,
@@ -32,17 +36,10 @@ private:
     uint64_t UpdateAggregateBitboardsFromPieceBitboards();
     uint64_t UpdateAllWhiteOccupiedSquaresBitBoard();
     uint64_t UpdateAllBlackOccupiedSquaresBitBoard();
-    bool white_can_castle_king_side_;
-    bool white_can_castle_queen_side_;
-    bool black_can_castle_king_side_;
-    bool black_can_castle_queen_side_;
-    //number of half moves since the last capture or pawn advance.
-    // This is monitored to honour the fifty move rule.
+    bool castling_rights_[2][2];
     uint8_t half_move_count_;
     short int full_move_count_;
     bool side_to_move_; // using defined constants WHITE (true) or BLACK (false)
-    // 64 bit integers store a single piece of informatio for each square
-    // on the board. By combining bitboards you can store the full position.
     struct PieceBitboards {
             uint64_t occupied_squares;
             uint64_t king;
@@ -60,9 +57,12 @@ private:
     std::stack<uint64_t*> captured_pieces;
 public:
     Position();
+
     void SetStartingPosition();
     void UpdatePositionWithSingleMove(Move& move);
-    void UpdateAllBitboardsWithSingleMove(uint16_t origin_sq, uint16_t destination_sq, bool side_to_update);
+    void UpdateMovingPieceBitboardWithSingleMove(uint64_t origin_bitboard, uint64_t destination_bitboard);
+    uint64_t* GetPieceBitboardBasedOnBoardLocation(uint64_t board_location_bitboard, bool side_to_check);
+    void ToggleBitboardBits(uint64_t& piece_bitboard, uint64_t toggle_positions);
 
     uint64_t GetAllOccupiedSquaresBitBoard() {return bitboard.all_occupied_squares;}
     uint64_t GetEnPassanteBitBoard() {return bitboard.en_passante;}
@@ -82,15 +82,15 @@ public:
     void SetPawnsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].pawns = new_bitboard; }
     
     bool GetSideToMove() {return side_to_move_;}
-    bool GetWhiteCanCastleKingSideFlag() {return white_can_castle_king_side_;}
-    bool GetWhiteCanCastleQueenSideFlag() {return white_can_castle_queen_side_;}
-    bool GetBlackCanCastleKingSideFlag() {return black_can_castle_king_side_;}
-    bool GetBlackCanCastleQueenSideFlag() {return black_can_castle_queen_side_;}
     uint8_t GetHalfMoveCount() {return half_move_count_;}
     short int GetFullMoveCount() {return full_move_count_;}
 
-    void PrintBitBoard(uint64_t);
+    bool WhiteCanCastleKingSide() { return castling_rights_[WHITE][KING_SIDE_CASTLE]; }
+    bool WhiteCanCastleQueenSide() { return castling_rights_[WHITE][QUEEN_SIDE_CASTLE]; }
+    bool BlackCanCastleKingSide() { return castling_rights_[BLACK][KING_SIDE_CASTLE]; }
+    bool BlackCanCastleQueenSide() { return castling_rights_[BLACK][QUEEN_SIDE_CASTLE]; }
 
+    void PrintBitBoard(uint64_t);
     BitBoardLookupTables bitboard_lookup;
 };
 
