@@ -7,7 +7,7 @@
 #include <stack>
 
 #include "move.h"
-#include "generate-bitboard-lookup-tables.h"
+#include "./bitboard_utilities/generate-bitboard-lookup-tables.h"
 
 #define WHITE 1
 #define BLACK 0
@@ -53,7 +53,7 @@ private:
         uint64_t en_passante;
         uint64_t all_occupied_squares;
         PieceBitboards piece_bitboards [2];
-    } bitboard;
+    } bitboard_;
     std::stack<uint64_t*> captured_pieces;
 public:
     Position();
@@ -64,22 +64,30 @@ public:
     uint64_t* GetPieceBitboardBasedOnBoardLocation(uint64_t board_location_bitboard, bool side_to_check);
     void ToggleBitboardBits(uint64_t& piece_bitboard, uint64_t toggle_positions);
 
-    uint64_t GetAllOccupiedSquaresBitBoard() {return bitboard.all_occupied_squares;}
-    uint64_t GetEnPassanteBitBoard() {return bitboard.en_passante;}
-    uint64_t GetOccupiedSquaresBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].occupied_squares;}
-    uint64_t GetKingBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].king;}
-    uint64_t GetQueenBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].queen;}
-    uint64_t GetRooksBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].rooks;}
-    uint64_t GetKnightsBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].knights;}
-    uint64_t GetBishopsBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].bishops;}
-    uint64_t GetPawnsBitBoard(bool side_to_move) {return bitboard.piece_bitboards[side_to_move].pawns;}
+    uint64_t GetAllOccupiedSquaresBitBoard() {return bitboard_.all_occupied_squares;}
+    uint64_t GetEnPassanteBitBoard() {return bitboard_.en_passante;}
+    uint64_t GetOccupiedSquaresBitBoard(bool side_to_move) {return bitboard_.piece_bitboards[side_to_move].occupied_squares;}
+    uint64_t GetKingBitBoard(bool side_to_move) {return bitboard_.piece_bitboards[side_to_move].king;}
+    uint64_t GetQueenBitBoard(bool side_to_move) {return bitboard_.piece_bitboards[side_to_move].queen;}
+    uint64_t GetRooksBitBoard(bool side_to_move) {return bitboard_.piece_bitboards[side_to_move].rooks;}
+    uint64_t GetKnightsBitBoard(bool side_to_move) {return bitboard_.piece_bitboards[side_to_move].knights;}
+    uint64_t GetBishopsBitBoard(bool side_to_move) {return bitboard_.piece_bitboards[side_to_move].bishops;}
+    uint64_t GetPawnsBitBoard(bool side_to_move) {return bitboard_.piece_bitboards[side_to_move].pawns;}
 
-    void SetKingBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].king = new_bitboard; }
-    void SetQueenBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].queen = new_bitboard; }
-    void SetRooksBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].rooks = new_bitboard; }
-    void SetKnightsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].knights = new_bitboard; }
-    void SetBishopsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].bishops = new_bitboard; }
-    void SetPawnsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard.piece_bitboards[side_to_move].pawns = new_bitboard; }
+    uint64_t GetActiveSidesOccupiedSquaresBB() {return bitboard_.piece_bitboards[side_to_move_].occupied_squares;}
+    uint64_t GetKingBitBoard() {return bitboard_.piece_bitboards[side_to_move_].king;}
+    uint64_t GetQueenBitBoard() {return bitboard_.piece_bitboards[side_to_move_].queen;}
+    uint64_t GetRooksBitBoard() {return bitboard_.piece_bitboards[side_to_move_].rooks;}
+    uint64_t GetKnightsBitBoard() {return bitboard_.piece_bitboards[side_to_move_].knights;}
+    uint64_t GetBishopsBitBoard() {return bitboard_.piece_bitboards[side_to_move_].bishops;}
+    uint64_t GetPawnsBitBoard() {return bitboard_.piece_bitboards[side_to_move_].pawns;}
+
+    void SetKingBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard_.piece_bitboards[side_to_move].king = new_bitboard; }
+    void SetQueenBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard_.piece_bitboards[side_to_move].queen = new_bitboard; }
+    void SetRooksBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard_.piece_bitboards[side_to_move].rooks = new_bitboard; }
+    void SetKnightsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard_.piece_bitboards[side_to_move].knights = new_bitboard; }
+    void SetBishopsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard_.piece_bitboards[side_to_move].bishops = new_bitboard; }
+    void SetPawnsBitBoard(bool side_to_move, uint64_t new_bitboard) { bitboard_.piece_bitboards[side_to_move].pawns = new_bitboard; }
     
     bool GetSideToMove() {return side_to_move_;}
     uint8_t GetHalfMoveCount() {return half_move_count_;}

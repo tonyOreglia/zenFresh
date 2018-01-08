@@ -10,22 +10,22 @@ Position::Position()
 */
 void Position::SetStartingPosition() {
     // moving single bit to the starting position of White King and
-    // assigning that value to the white king bitboard.
-    bitboard.piece_bitboards[WHITE].king = 1ULL << E1;
-    bitboard.piece_bitboards[WHITE].queen = 1ULL << D1;
-    bitboard.piece_bitboards[WHITE].rooks = (1ULL << A1) | (1ULL << H1);
-    bitboard.piece_bitboards[WHITE].knights = (1ULL << B1) | (1ULL << G1);
-    bitboard.piece_bitboards[WHITE].bishops = (1ULL << C1) | (1ULL << F1);
-    bitboard.piece_bitboards[WHITE].pawns = 0xFF000000000000;
+    // assigning that value to the white king bitboard_.
+    bitboard_.piece_bitboards[WHITE].king = 1ULL << E1;
+    bitboard_.piece_bitboards[WHITE].queen = 1ULL << D1;
+    bitboard_.piece_bitboards[WHITE].rooks = (1ULL << A1) | (1ULL << H1);
+    bitboard_.piece_bitboards[WHITE].knights = (1ULL << B1) | (1ULL << G1);
+    bitboard_.piece_bitboards[WHITE].bishops = (1ULL << C1) | (1ULL << F1);
+    bitboard_.piece_bitboards[WHITE].pawns = 0xFF000000000000;
 
-    bitboard.piece_bitboards[BLACK].king = 1ULL << E8;
-    bitboard.piece_bitboards[BLACK].queen = 1ULL << D8;
-    bitboard.piece_bitboards[BLACK].rooks = (1ULL << A8) | (1ULL << H8);
-    bitboard.piece_bitboards[BLACK].knights = (1ULL << B8) | (1ULL << G8);
-    bitboard.piece_bitboards[BLACK].bishops = (1ULL << C8) | (1ULL << F8);
-    bitboard.piece_bitboards[BLACK].pawns = 0xFF00;
+    bitboard_.piece_bitboards[BLACK].king = 1ULL << E8;
+    bitboard_.piece_bitboards[BLACK].queen = 1ULL << D8;
+    bitboard_.piece_bitboards[BLACK].rooks = (1ULL << A8) | (1ULL << H8);
+    bitboard_.piece_bitboards[BLACK].knights = (1ULL << B8) | (1ULL << G8);
+    bitboard_.piece_bitboards[BLACK].bishops = (1ULL << C8) | (1ULL << F8);
+    bitboard_.piece_bitboards[BLACK].pawns = 0xFF00;
 
-    bitboard.en_passante = 0ULL;
+    bitboard_.en_passante = 0ULL;
     castling_rights_[WHITE][QUEEN_SIDE_CASTLE] = true;
     castling_rights_[WHITE][KING_SIDE_CASTLE] = true;
     castling_rights_[BLACK][KING_SIDE_CASTLE] = true;
@@ -47,17 +47,17 @@ void Position::SetStartingPosition() {
  */
 uint64_t* Position::GetPieceBitboardBasedOnBoardLocation(uint64_t board_location_bitboard, bool side_to_check) {
     if (GetKingBitBoard(side_to_check) & board_location_bitboard) {
-        return &bitboard.piece_bitboards[side_to_check].king;
+        return &bitboard_.piece_bitboards[side_to_check].king;
     } else if (GetQueenBitBoard(side_to_check) & board_location_bitboard) {
-        return &bitboard.piece_bitboards[side_to_check].queen;
+        return &bitboard_.piece_bitboards[side_to_check].queen;
     } else if (GetRooksBitBoard(side_to_check) & board_location_bitboard) {
-        return &bitboard.piece_bitboards[side_to_check].rooks;
+        return &bitboard_.piece_bitboards[side_to_check].rooks;
     } else if (GetBishopsBitBoard(side_to_check) & board_location_bitboard) {
-       return &bitboard.piece_bitboards[side_to_check].bishops;
+       return &bitboard_.piece_bitboards[side_to_check].bishops;
     } else if (GetKnightsBitBoard(side_to_check) & board_location_bitboard) {
-        return &bitboard.piece_bitboards[side_to_check].knights;
+        return &bitboard_.piece_bitboards[side_to_check].knights;
     } else if (GetPawnsBitBoard(side_to_check) & board_location_bitboard) {
-        return &bitboard.piece_bitboards[side_to_check].pawns;
+        return &bitboard_.piece_bitboards[side_to_check].pawns;
     } else {
         return nullptr;
     }
@@ -77,7 +77,7 @@ void Position::UpdateMovingPieceBitboardWithSingleMove(uint64_t origin_bitboard,
 }
 
 /**
- * Toggle the bits of a bitboard.
+ * Toggle the bits of a bitboard_.
  * @param (uint64_t&) piece_bitboard - Bitboard representing the position(s) of a piece
  * type of a particular color e.g. white bishops.
  * @param (uint64_t) toggle_positions - Bitboard indicating which bit positions to be toggled.
@@ -99,11 +99,11 @@ void Position::UpdatePositionWithSingleMove(Move& move) {
     UpdateMovingPieceBitboardWithSingleMove(origin_bitboard, destination_bitboard);
 
     if (move.IsDoublePawnPush()) {
-        bitboard.en_passante = 
+        bitboard_.en_passante = 
             bitboard_lookup.en_passant_bitboad_lookup_by_pawn_destination[destination_sq];
     }
     if (move.IsEnPassantCapture()) {
-        ToggleBitboardBits(bitboard.piece_bitboards[!side_to_move_].pawns,
+        ToggleBitboardBits(bitboard_.piece_bitboards[!side_to_move_].pawns,
             bitboard_lookup.attacked_pawn_location_for_en_passant_capture[destination_sq]);
     } else if (move.IsCapture()) {
         uint64_t* captured_piece_bitboard =
@@ -119,18 +119,18 @@ void Position::UpdatePositionWithSingleMove(Move& move) {
     UpdateAggregateBitboardsFromPieceBitboards(); 
 
     if (move.IsPromotion()) {
-        ToggleBitboardBits(bitboard.piece_bitboards[side_to_move_].pawns, destination_bitboard);
+        ToggleBitboardBits(bitboard_.piece_bitboards[side_to_move_].pawns, destination_bitboard);
         if(move.PromotePawnToQueen()){
-            ToggleBitboardBits(bitboard.piece_bitboards[side_to_move_].queen, destination_bitboard);
+            ToggleBitboardBits(bitboard_.piece_bitboards[side_to_move_].queen, destination_bitboard);
         }
         else if(move.PromotePawnToRook()) {
-            ToggleBitboardBits(bitboard.piece_bitboards[side_to_move_].rooks, destination_bitboard);
+            ToggleBitboardBits(bitboard_.piece_bitboards[side_to_move_].rooks, destination_bitboard);
         }
         else if(move.PromotePawnToKnight()) {
-            ToggleBitboardBits(bitboard.piece_bitboards[side_to_move_].knights, destination_bitboard);
+            ToggleBitboardBits(bitboard_.piece_bitboards[side_to_move_].knights, destination_bitboard);
         }
         else if(move.PromotePawnToBishop()) {
-            ToggleBitboardBits(bitboard.piece_bitboards[side_to_move_].bishops, destination_bitboard);
+            ToggleBitboardBits(bitboard_.piece_bitboards[side_to_move_].bishops, destination_bitboard);
         }
     }
 
@@ -148,7 +148,7 @@ void Position::UpdatePositionWithSingleMove(Move& move) {
  * Update is based on the underlying bitboards representing the location of each piece.
 */
 uint64_t Position::UpdateAggregateBitboardsFromPieceBitboards() {
-    return bitboard.all_occupied_squares =
+    return bitboard_.all_occupied_squares =
         this->UpdateAllWhiteOccupiedSquaresBitBoard() |
         this->UpdateAllBlackOccupiedSquaresBitBoard();
 }
@@ -159,13 +159,13 @@ uint64_t Position::UpdateAggregateBitboardsFromPieceBitboards() {
  * of each white piece type.
 */
 uint64_t Position::UpdateAllWhiteOccupiedSquaresBitBoard() {
-    return bitboard.piece_bitboards[WHITE].occupied_squares =
-        bitboard.piece_bitboards[WHITE].king |
-        bitboard.piece_bitboards[WHITE].queen |
-        bitboard.piece_bitboards[WHITE].rooks |
-        bitboard.piece_bitboards[WHITE].knights |
-        bitboard.piece_bitboards[WHITE].bishops |
-        bitboard.piece_bitboards[WHITE].pawns;
+    return bitboard_.piece_bitboards[WHITE].occupied_squares =
+        bitboard_.piece_bitboards[WHITE].king |
+        bitboard_.piece_bitboards[WHITE].queen |
+        bitboard_.piece_bitboards[WHITE].rooks |
+        bitboard_.piece_bitboards[WHITE].knights |
+        bitboard_.piece_bitboards[WHITE].bishops |
+        bitboard_.piece_bitboards[WHITE].pawns;
 }
 
 /**
@@ -174,13 +174,13 @@ uint64_t Position::UpdateAllWhiteOccupiedSquaresBitBoard() {
  * of each black piece type.
 */
 uint64_t Position::UpdateAllBlackOccupiedSquaresBitBoard() {
-    return bitboard.piece_bitboards[BLACK].occupied_squares =
-        bitboard.piece_bitboards[BLACK].king |
-        bitboard.piece_bitboards[BLACK].queen |
-        bitboard.piece_bitboards[BLACK].rooks |
-        bitboard.piece_bitboards[BLACK].knights |
-        bitboard.piece_bitboards[BLACK].bishops |
-        bitboard.piece_bitboards[BLACK].pawns;
+    return bitboard_.piece_bitboards[BLACK].occupied_squares =
+        bitboard_.piece_bitboards[BLACK].king |
+        bitboard_.piece_bitboards[BLACK].queen |
+        bitboard_.piece_bitboards[BLACK].rooks |
+        bitboard_.piece_bitboards[BLACK].knights |
+        bitboard_.piece_bitboards[BLACK].bishops |
+        bitboard_.piece_bitboards[BLACK].pawns;
 }
 
 /**

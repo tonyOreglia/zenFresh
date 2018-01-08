@@ -1,5 +1,5 @@
-#ifndef MOVE_H
-#define MOVE_H
+#ifndef move__H
+#define move__H
 
 #include <cstdint>
 
@@ -24,7 +24,7 @@ private:
                double pawn push, and en passant capture.
     Bits 12-15:
      * promotion | capture | special 1 | special 2
-     * 0 | 0 | 0 | 0 - quiet moves
+     * 0 | 0 | 0 | 0 - quiet move_s
      * 0 | 0 | 0 | 1 - double pawn push
      * 0 | 0 | 1 | 0 - king side castle
      * 0 | 0 | 1 | 1 - queen side castle
@@ -39,34 +39,34 @@ private:
      * 1 | 1 | 1 | 0 - rook promotion capture
      * 1 | 1 | 1 | 1 - queen promotion capture
      */
-    uint16_t move;
+    uint16_t move_;
 public:
-    Move() { move = 0; }
-    void SetOriginSquare(uint8_t origin) { move |= (origin << 10); }
-    void SetDestinationSquare(uint8_t destination) { move |= (destination << 4); }
-    void SetDoublePawnPushFlag() { move |= SPECIAL_2_MASK; }
-    void SetCaptureFlag() { move |= CAPTURE_MASK; }
-    void SetPromotionFlag() { move |= PROMOTION_MASK; }
-    void SetKingSideCastleFlag() { move |= SPECIAL_1_MASK; }
-    void SetQueenSideCastleFlag() { move |= SPECIAL_1_2_MASK; }
-    void SetEnPassantCaptureFlag() { move |=  EN_PASSANT_CAPTURE_MASK; }
-    void SetPromotionPieceToQueen() { move |=  SPECIAL_1_2_MASK; }
-    void SetPromotionPieceToRook() { move |= SPECIAL_1_MASK; }
+    Move() { move_ = 0; }
+    void SetOriginSquare(uint8_t origin) { move_ |= (origin << 10); }
+    void SetDestinationSquare(uint8_t destination) { move_ |= (destination << 4); }
+    void SetDoublePawnPushFlag() { move_ |= SPECIAL_2_MASK; }
+    void SetCaptureFlag() { move_ |= CAPTURE_MASK; }
+    void SetPromotionFlag() { move_ |= PROMOTION_MASK; }
+    void SetKingSideCastleFlag() { move_ |= SPECIAL_1_MASK; }
+    void SetQueenSideCastleFlag() { move_ |= SPECIAL_1_2_MASK; }
+    void SetEnPassantCaptureFlag() { move_ |=  EN_PASSANT_CAPTURE_MASK; }
+    void SetPromotionPieceToQueen() { move_ |=  SPECIAL_1_2_MASK; }
+    void SetPromotionPieceToRook() { move_ |= SPECIAL_1_MASK; }
     void SetPromotionPieceToKnight() {;} // nothing to be done
-    void SetPromotionPieceToBishop() { move |= SPECIAL_2_MASK; }
+    void SetPromotionPieceToBishop() { move_ |= SPECIAL_2_MASK; }
 
-    uint16_t GetOriginSquare() { return move >> 10; }
-    uint16_t GetDestinationSquare() { return ( move & DESTINATION_MASK ) >> 4; }
-    bool IsDoublePawnPush() { return (move & FLAGS_MASK) == 1; }
-    bool IsCapture() { return (bool)(move & CAPTURE_MASK); }
-    bool IsPromotion() { return  (bool)(move & PROMOTION_MASK); }
-    bool IsKingSideCastle() { return (move & FLAGS_MASK) == 2; }
-    bool IsQueenSideCastle() { return (move & FLAGS_MASK) == 3; }
-    bool IsEnPassantCapture() { return (move & FLAGS_MASK) == 5; }
-    bool PromotePawnToQueen() { return (move & SPECIAL_1_2_MASK) == 3; }
-    bool PromotePawnToRook() { return (move & SPECIAL_1_2_MASK) == 2; }
-    bool PromotePawnToKnight() { return !(move & SPECIAL_1_2_MASK); }
-    bool PromotePawnToBishop() { return (move & SPECIAL_1_2_MASK) == 1; }
+    uint16_t GetOriginSquare() { return move_ >> 10; }
+    uint16_t GetDestinationSquare() { return ( move_ & DESTINATION_MASK ) >> 4; }
+    bool IsDoublePawnPush() { return (move_ & FLAGS_MASK) == 1; }
+    bool IsCapture() { return (bool)(move_ & CAPTURE_MASK); }
+    bool IsPromotion() { return  (bool)(move_ & PROMOTION_MASK); }
+    bool IsKingSideCastle() { return (move_ & FLAGS_MASK) == 2; }
+    bool IsQueenSideCastle() { return (move_ & FLAGS_MASK) == 3; }
+    bool IsEnPassantCapture() { return (move_ & FLAGS_MASK) == 5; }
+    bool PromotePawnToQueen() { return (move_ & SPECIAL_1_2_MASK) == 3; }
+    bool PromotePawnToRook() { return (move_ & SPECIAL_1_2_MASK) == 2; }
+    bool PromotePawnToKnight() { return !(move_ & SPECIAL_1_2_MASK); }
+    bool PromotePawnToBishop() { return (move_ & SPECIAL_1_2_MASK) == 1; }
 };
 
 #endif

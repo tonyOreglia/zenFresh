@@ -27,12 +27,11 @@ BitBoardLookupTables::BitBoardLookupTables() {
     GenerateArrayBitboardLookup();
     GenerateEnPassantBitboardLookup();
     PrintAllBitboards();
-    
 }
 
 void BitBoardLookupTables::GenerateSingleBitLookup() {
     for (int i=0; i<64; i++) {
-        bitboard[i] = 1ULL << i;
+        single_index_bitboard_[i] = 1ULL << i;
     }
 }
 
@@ -40,14 +39,14 @@ void BitBoardLookupTables::GenerateEnPassantBitboardLookup() {
     for (char i=0; i<64; i++) {
         en_passant_bitboad_lookup_by_pawn_destination[i] = 0ULL;
         if (i > 23 && i < 32) {
-            en_passant_bitboad_lookup_by_pawn_destination[i] = bitboard[i - 8];
+            en_passant_bitboad_lookup_by_pawn_destination[i] = single_index_bitboard_[i - 8];
         }
         else if (i > 31 && i < 40) {
-            en_passant_bitboad_lookup_by_pawn_destination[i] = bitboard[i + 8];
+            en_passant_bitboad_lookup_by_pawn_destination[i] = single_index_bitboard_[i + 8];
         } else if (i > 15 && i < 24) {
-            attacked_pawn_location_for_en_passant_capture[i] = bitboard[i+8];
+            attacked_pawn_location_for_en_passant_capture[i] = single_index_bitboard_[i+8];
         } else if (i > 39 && i < 48) {
-            attacked_pawn_location_for_en_passant_capture[i] = bitboard[i+8];
+            attacked_pawn_location_for_en_passant_capture[i] = single_index_bitboard_[i+8];
         }
     }
 }
@@ -56,60 +55,72 @@ void BitBoardLookupTables::GenerateArrayBitboardLookup() {
     for (int index=0; index<64; index++) {
         int north_of_index = index;
         while (north_of_index > 7) {
-            north_array_bitboard_lookup[index] |= bitboard[north_of_index - 8];
+            north_array_bitboard_lookup[index] |= single_index_bitboard_[north_of_index - 8];
             north_of_index -= 8;
         }
         int south_of_index = index;
         while (south_of_index < 56) {
-            south_array_bitboard_lookup[index] |= bitboard[south_of_index + 8];
+            south_array_bitboard_lookup[index] |= single_index_bitboard_[south_of_index + 8];
             south_of_index += 8;
         }
         int east_of_index = index;
-        while (!((bitboard[east_of_index]) & h_file)) {
-            east_array_bitboard_lookup[index] |= bitboard[east_of_index + 1];
+        while (!((single_index_bitboard_[east_of_index]) & h_file)) {
+            east_array_bitboard_lookup[index] |= single_index_bitboard_[east_of_index + 1];
             east_of_index += 1;
         }
         int west_of_index = index;
-        while (!((bitboard[west_of_index]) & a_file)) {
-            west_array_bitboard_lookup[index] |= bitboard[west_of_index - 1];
+        while (!((single_index_bitboard_[west_of_index]) & a_file)) {
+            west_array_bitboard_lookup[index] |= single_index_bitboard_[west_of_index - 1];
             west_of_index -= 1;
         }
         int north_east_of_index = index;
-        while(!((bitboard[north_east_of_index]) & h_file) && north_east_of_index > 7) {
-            north_east_array_bitboard_lookup[index] |= bitboard[north_east_of_index - 7];
+        while(!((single_index_bitboard_[north_east_of_index]) & h_file) && north_east_of_index > 7) {
+            north_east_array_bitboard_lookup[index] |= single_index_bitboard_[north_east_of_index - 7];
             north_east_of_index -= 7;
         }
         int north_west_of_index = index;
-        while(!((bitboard[north_west_of_index]) & a_file) && north_west_of_index > 8) {
-            north_west_array_bitboard_lookup[index] |= bitboard[north_west_of_index - 9];
+        while(!((single_index_bitboard_[north_west_of_index]) & a_file) && north_west_of_index > 8) {
+            north_west_array_bitboard_lookup[index] |= single_index_bitboard_[north_west_of_index - 9];
             north_west_of_index -= 9;
         }
         int south_east_of_index = index;
-        while(!((bitboard[south_east_of_index]) & h_file) && south_east_of_index < 56) {
-            south_east_array_bitboard_lookup[index] |= bitboard[south_east_of_index + 9];
+        while(!((single_index_bitboard_[south_east_of_index]) & h_file) && south_east_of_index < 56) {
+            south_east_array_bitboard_lookup[index] |= single_index_bitboard_[south_east_of_index + 9];
             south_east_of_index += 9;
         }
         int south_west_of_index = index;
-        while(!((bitboard[south_west_of_index]) & a_file) && south_west_of_index < 56) {
-            south_west_array_bitboard_lookup[index] |= bitboard[south_west_of_index + 7];
+        while(!((single_index_bitboard_[south_west_of_index]) & a_file) && south_west_of_index < 56) {
+            south_west_array_bitboard_lookup[index] |= single_index_bitboard_[south_west_of_index + 7];
             south_west_of_index += 7;
         }
-        if((index + 10) < 64 && !(bitboard[index] & (h_file | g_file)))
-            { knight_attack_bitboard_lookup[index] |= bitboard[index + 10]; }
-        if((index + 6) < 64 && !(bitboard[index] & (a_file | b_file)))
-            { knight_attack_bitboard_lookup[index] |= bitboard[index + 6]; }
-        if((index + 17) < 64 && !(bitboard[index] & h_file))  
-            { knight_attack_bitboard_lookup[index] |= bitboard[index + 17]; }
-        if((index + 15) < 64 && !(bitboard[index] & a_file)) 
-            { knight_attack_bitboard_lookup[index] |= bitboard[index + 15]; }
-        if( (index - 10) >= 0 && !(bitboard[index] & (a_file | b_file)))
-            { knight_attack_bitboard_lookup[index] |= bitboard[index - 10]; }
-        if( (index - 6) >= 0 && !(bitboard[index] & (h_file | g_file)))
-            { knight_attack_bitboard_lookup[index] |= bitboard[index - 6]; }
-        if( (index - 17) >= 0 && !(bitboard[index] & a_file)) 
-            { knight_attack_bitboard_lookup[index] |= bitboard[index - 17]; }
-        if( (index - 15) >= 0 && !(bitboard[index] & h_file))
-            { knight_attack_bitboard_lookup[index] |= bitboard[index - 15]; }
+        if((index + 10) < 64 && !(single_index_bitboard_[index] & (h_file | g_file)))
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index + 10]; }
+        if((index + 6) < 64 && !(single_index_bitboard_[index] & (a_file | b_file)))
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index + 6]; }
+        if((index + 17) < 64 && !(single_index_bitboard_[index] & h_file))  
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index + 17]; }
+        if((index + 15) < 64 && !(single_index_bitboard_[index] & a_file)) 
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index + 15]; }
+        if( (index - 10) >= 0 && !(single_index_bitboard_[index] & (a_file | b_file)))
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index - 10]; }
+        if( (index - 6) >= 0 && !(single_index_bitboard_[index] & (h_file | g_file)))
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index - 6]; }
+        if( (index - 17) >= 0 && !(single_index_bitboard_[index] & a_file)) 
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index - 17]; }
+        if( (index - 15) >= 0 && !(single_index_bitboard_[index] & h_file))
+            { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index - 15]; }
+    }
+}
+
+void BitBoardLookupTables::GenerateSliderPieceBitboardLookup() {
+    for (char i=0; i<64; i++) {
+        rook_moves_bitboard_lookup[i] = north_array_bitboard_lookup[i] |
+            south_array_bitboard_lookup[i] | east_array_bitboard_lookup[i] |
+            west_array_bitboard_lookup[i];
+        bishop_moves_bitboard_lookup[i] = north_east_array_bitboard_lookup[i] |
+            north_west_array_bitboard_lookup[i] | south_east_array_bitboard_lookup[i] |
+            south_west_array_bitboard_lookup[i];
+        queen_moves_bitboard_lookup[i] = rook_moves_bitboard_lookup[i] | bishop_moves_bitboard_lookup[i];  
     }
 }
 
@@ -132,7 +143,7 @@ void BitBoardLookupTables::PrintAllBitboards() {
     PrintBitBoard(h_file);
     for (char i=0; i<64; i++) {
         cout << "\tBITBOARD LOOKUP\n\n";
-        PrintBitBoard(bitboard[i]);
+        PrintBitBoard(single_index_bitboard_[i]);
         cout << "\tNORTH\n\n";
         PrintBitBoard(north_array_bitboard_lookup[i]);
         cout << "\tSOUTH\n\n";
