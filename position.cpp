@@ -113,7 +113,6 @@ void Position::UpdatePositionWithSingleMove(Move& move) {
         captured_pieces.push(captured_piece_bitboard);
     }
     
-
     // only update aggregate bitboards after updating moving piece bitboards, and
     // the attacked piece bitboard if there is one.
     UpdateAggregateBitboardsFromPieceBitboards(); 

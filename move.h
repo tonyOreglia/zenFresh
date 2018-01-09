@@ -2,6 +2,9 @@
 #define move__H
 
 #include <cstdint>
+#include <iostream>
+
+#include "./bitboard_utilities/bitboard-utilities.h"
 
 #define ORIGIN_MASK 0xFC00
 #define DESTINATION_MASK 0x3F0
@@ -12,6 +15,8 @@
 #define SPECIAL_2_MASK 0x1
 #define SPECIAL_1_2_MASK 0x3
 #define EN_PASSANT_CAPTURE_MASK 0x5
+
+using namespace std; 
 
 class Move {
 private:
@@ -42,13 +47,15 @@ private:
     uint16_t move_;
 public:
     Move() { move_ = 0; }
+    Move(uint16_t move) { move_ = move; }
+    Move(uint8_t origin, uint8_t destination) { move_ = origin << 10 | destination << 4; }
     void SetOriginSquare(uint8_t origin) { move_ |= (origin << 10); }
     void SetDestinationSquare(uint8_t destination) { move_ |= (destination << 4); }
     void SetDoublePawnPushFlag() { move_ |= SPECIAL_2_MASK; }
     void SetCaptureFlag() { move_ |= CAPTURE_MASK; }
     void SetPromotionFlag() { move_ |= PROMOTION_MASK; }
-    void SetKingSideCastleFlag() { move_ |= SPECIAL_1_MASK; }
-    void SetQueenSideCastleFlag() { move_ |= SPECIAL_1_2_MASK; }
+    void SetRemoveKingSideCastleRightsFlag() { move_ |= SPECIAL_1_MASK; }
+    void SetRemoveQueenSideCastleRightsFlag() { move_ |= SPECIAL_1_2_MASK; }
     void SetEnPassantCaptureFlag() { move_ |=  EN_PASSANT_CAPTURE_MASK; }
     void SetPromotionPieceToQueen() { move_ |=  SPECIAL_1_2_MASK; }
     void SetPromotionPieceToRook() { move_ |= SPECIAL_1_MASK; }
@@ -60,13 +67,15 @@ public:
     bool IsDoublePawnPush() { return (move_ & FLAGS_MASK) == 1; }
     bool IsCapture() { return (bool)(move_ & CAPTURE_MASK); }
     bool IsPromotion() { return  (bool)(move_ & PROMOTION_MASK); }
-    bool IsKingSideCastle() { return (move_ & FLAGS_MASK) == 2; }
-    bool IsQueenSideCastle() { return (move_ & FLAGS_MASK) == 3; }
+    bool RemoveKingSideCastlingRights() { return (move_ & FLAGS_MASK) == 2; }
+    bool RemoveQueenSideCastlingRights() { return (move_ & FLAGS_MASK) == 3; }
     bool IsEnPassantCapture() { return (move_ & FLAGS_MASK) == 5; }
     bool PromotePawnToQueen() { return (move_ & SPECIAL_1_2_MASK) == 3; }
     bool PromotePawnToRook() { return (move_ & SPECIAL_1_2_MASK) == 2; }
     bool PromotePawnToKnight() { return !(move_ & SPECIAL_1_2_MASK); }
     bool PromotePawnToBishop() { return (move_ & SPECIAL_1_2_MASK) == 1; }
+
+    void PrintMove();
 };
 
 #endif

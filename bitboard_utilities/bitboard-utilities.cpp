@@ -1,4 +1,4 @@
-#include <cstdint>
+#include "bitboard-utilities.h"
 
 /**
  * Return index of least significant bitboard bit.

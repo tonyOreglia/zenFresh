@@ -1,40 +1,72 @@
 #include "game.h"
 
-Game::Game(Position position) {
+Game::Game(Position position) : bitboard_lookup_(position.bitboard_lookup) {
     this->position = position;
     bitboard_lookup_ = position.bitboard_lookup;
-    potential_moves_.reserve(DEPTH);
+    potential_moves_ = new vector<Move>[DEPTH];
     for (char i = 0; i < DEPTH; i++) {
         potential_moves_[i].reserve(MAX_MOVES_FROM_SINGLE_POSITION);
     }
 }
 
-void Game::GenerateMoves() {
-    // Generate rook moves
-    char j=0;
+void Game::GenerateMoves(vector <Move>& move_list) {
+    GenerateRookMoves(move_list);
+    GenerateBishopMoves(move_list);
+}
+
+void Game::PushSingleMoveFromValidMovesBBToMovesVector(
+        uint8_t origin_square,
+        uint64_t &valid_moves_bb,
+        vector <Move>& move_list
+    ) {
+    uint8_t destination_position = lsb_scan(valid_moves_bb);
+    valid_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+    Move move(origin_square, destination_position);
+    if (
+        bitboard_lookup_.single_index_bitboard_[destination_position] &
+        position.GetOccupiedSquaresBitBoard(!position.GetSideToMove())
+    ) move.SetCaptureFlag();
+    move_list.push_back(move);
+}
+
+
+
+void Game::GenerateBishopMoves(vector <Move>& move_list) {
+    uint64_t bishop_bitboard_copy = position.GetBishopsBitBoard();
+
+    while(bishop_bitboard_copy) {
+        uint8_t bishop_position = lsb_scan(bishop_bitboard_copy);
+        bishop_bitboard_copy ^= position.bitboard_lookup.single_index_bitboard_[bishop_position];
+        uint64_t valid_moves_bb = GenerateValidDiagonalSlidingMovesBB(bishop_position);
+        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
+
+        while(valid_moves_bb) {
+            PushSingleMoveFromValidMovesBBToMovesVector(bishop_position, valid_moves_bb, move_list);
+        }
+    }
+}
+
+void Game::GenerateRookMoves(vector <Move>& move_list) {
     uint64_t rook_bitboard_copy = position.GetRooksBitBoard();
 
-
     while(rook_bitboard_copy) {
-        char rook_position = lsb_scan(rook_bitboard_copy);
+        uint8_t rook_position = lsb_scan(rook_bitboard_copy);
         rook_bitboard_copy ^= position.bitboard_lookup.single_index_bitboard_[rook_position];
+        uint64_t valid_moves_bb = GenerateValidStraightSlidingMovesBB(rook_position);
+        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
 
-        uint64_t valid_attack_bitboard = GenerateValidMovesNorthBitboard(rook_position) |
-            GenerateValidMovesEastBitboard(rook_position) |
-            GenerateValidMovesSouthBitboard(rook_position) |
-            GenerateValidMovesWestBitboard(rook_position);
-        valid_attack_bitboard &= ~position.GetActiveSidesOccupiedSquaresBB();
-
-       
-        while(valid_attack_set) {
-            char destination_index = lsb_scan(valid_attack_set);
-            valid_attack_set ^= position.bitboard_lookup.single_index_bitboard_[destination_index];
-
-            
-            push_single_move(sigBit, sq, position->rooks+position->side);
-
-
+        while(valid_moves_bb) {
+            PushSingleMoveFromValidMovesBBToMovesVector(rook_position, valid_moves_bb, move_list);
+            if (rook_position == 7 || rook_position == 63) move_list.back().SetRemoveKingSideCastleRightsFlag();
+            if (rook_position == 0 || rook_position == 56) move_list.back().SetRemoveQueenSideCastleRightsFlag();   
+        }
     }
+}
+
+void Game::GenerateKingMoves(vector <Move>& move_list) {
+    // must check if Rook is on proper square for particular castling move.
+    // this is better than checking every move if it captures a rook.
+    // Rook moves will kill castling ability, but rook captures will not.
 }
 
 uint64_t Game::GenerateValidMovesNorthBitboard(char index) {
@@ -88,7 +120,7 @@ uint64_t Game::GenerateValidMovesWestBitboard(char index) {
     return bitboard_lookup_.west_array_bitboard_lookup[index];
 }
 
-uint64_t Game::GenerateValidMovesNortEasthBitboard(char index) {
+uint64_t Game::GenerateValidMovesNorthEastBitboard(char index) {
     uint64_t bb_occupied_squares_overlap_with_northeast_array = 
         position.GetAllOccupiedSquaresBitBoard() &
         bitboard_lookup_.north_east_array_bitboard_lookup[index];
@@ -101,7 +133,7 @@ uint64_t Game::GenerateValidMovesNortEasthBitboard(char index) {
     return bitboard_lookup_.north_east_array_bitboard_lookup[index];
 }
 
-uint64_t Game::GenerateValidMovesNortWesthBitboard(char index) {
+uint64_t Game::GenerateValidMovesNorthWestBitboard(char index) {
     uint64_t bb_occupied_squares_overlap_with_northwest_array = 
         position.GetAllOccupiedSquaresBitBoard() &
         bitboard_lookup_.north_west_array_bitboard_lookup[index];
@@ -135,7 +167,20 @@ uint64_t Game::GenerateValidMovesSouthWestBitboard(char index) {
     if(bb_occupied_squares_overlap_with_southwest_array) {
         char least_significant_bit = lsb_scan(bb_occupied_squares_overlap_with_southwest_array);
         return (bitboard_lookup_.south_west_array_bitboard_lookup[index] ^
-            bitboard_lookup_.south_west_array_bitboard_lookup[most_significant_bit]);
+            bitboard_lookup_.south_west_array_bitboard_lookup[least_significant_bit]);
     }
     return bitboard_lookup_.south_west_array_bitboard_lookup[index];
+}
+
+uint64_t Game::GenerateValidDiagonalSlidingMovesBB(char index) {
+    return (GenerateValidMovesNorthEastBitboard(index) |
+            GenerateValidMovesSouthEastBitboard(index) |
+            GenerateValidMovesSouthWestBitboard(index) |
+            GenerateValidMovesNorthWestBitboard(index));
+}
+uint64_t Game::GenerateValidStraightSlidingMovesBB(char index) {
+    return (GenerateValidMovesNorthBitboard(index) |
+            GenerateValidMovesEastBitboard(index) |
+            GenerateValidMovesSouthBitboard(index) |
+            GenerateValidMovesWestBitboard(index));
 }
