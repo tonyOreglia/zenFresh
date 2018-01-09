@@ -133,9 +133,9 @@ void Position::UpdatePositionWithSingleMove(Move& move) {
         }
     }
 
-    if (move.IsKingSideCastle()) {
+    if (move.RemoveKingSideCastlingRights()) {
         castling_rights_[side_to_move_][KING_SIDE_CASTLE] = false;
-    } else if (move.IsQueenSideCastle()) {
+    } else if (move.RemoveQueenSideCastlingRights()) {
         castling_rights_[side_to_move_][QUEEN_SIDE_CASTLE] = false;
     }
 }
