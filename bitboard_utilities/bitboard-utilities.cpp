@@ -16,7 +16,8 @@ unsigned msb_scan(uint64_t bitboard){
     return 63 - __builtin_clzll(bitboard);
 }
 
-// uint8_t EjectIndexFromBitboard(uint64_t &bb) {
-//     uint8_t index = lsb_scan(bb);
-//     bb ^= position.bitboard_lookup.single_index_bitboard_[bishop_position];
-// }
+uint8_t EjectIndexFromBitboard(uint64_t &bb, uint64_t* bb_lookup) {
+    uint8_t index = lsb_scan(bb);
+    bb ^= bb_lookup[index];
+    return index;
+}

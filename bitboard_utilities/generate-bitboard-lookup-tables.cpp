@@ -109,18 +109,51 @@ void BitBoardLookupTables::GenerateArrayBitboardLookup() {
             { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index - 17]; }
         if( (index - 15) >= 0 && !(single_index_bitboard_[index] & h_file))
             { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index - 15]; }
-    }
-}
+        
+        // all the following need to take into acount edge moves :((((
+        king_move_bitboard_lookup[0][index] =
+            single_index_bitboard_[index + 1] | single_index_bitboard_[index - 1] |
+            single_index_bitboard_[index + 8] | single_index_bitboard_[index - 8] |
+            single_index_bitboard_[index + 9] | single_index_bitboard_[index - 9] |
+            single_index_bitboard_[index + 7] | single_index_bitboard_[index - 7];
+        king_move_bitboard_lookup[1][index] = king_move_bitboard_lookup[0][index];
+        if (single_index_bitboard_[index] & a_file) {
+            king_move_bitboard_lookup[0][index] &= ~h_file;
+            king_move_bitboard_lookup[1][index] &= ~h_file;
+            }
+        if (single_index_bitboard_[index] & h_file) {
+            king_move_bitboard_lookup[0][index] &= ~a_file; 
+            king_move_bitboard_lookup[1][index] &= ~a_file; 
+            }
+        if (index == 4) {
+            king_move_bitboard_lookup[0][4] |= single_index_bitboard_[2] |
+                single_index_bitboard_[6];
+            }
+        if (index == 60) {
+            king_move_bitboard_lookup[1][60] |= single_index_bitboard_[62] |
+                single_index_bitboard_[58];
+            }
 
-void BitBoardLookupTables::GenerateSliderPieceBitboardLookup() {
-    for (char i=0; i<64; i++) {
-        rook_moves_bitboard_lookup[i] = north_array_bitboard_lookup[i] |
-            south_array_bitboard_lookup[i] | east_array_bitboard_lookup[i] |
-            west_array_bitboard_lookup[i];
-        bishop_moves_bitboard_lookup[i] = north_east_array_bitboard_lookup[i] |
-            north_west_array_bitboard_lookup[i] | south_east_array_bitboard_lookup[i] |
-            south_west_array_bitboard_lookup[i];
-        queen_moves_bitboard_lookup[i] = rook_moves_bitboard_lookup[i] | bishop_moves_bitboard_lookup[i];  
+        // PAWN MOVE
+        pawn_moves_bitboard_lookup[0][index] = single_index_bitboard_[index + 8] |
+            single_index_bitboard_[index + 9] | single_index_bitboard_[index + 7];
+        pawn_moves_bitboard_lookup[1][index] = single_index_bitboard_[index - 8] |
+            single_index_bitboard_[index - 9] | single_index_bitboard_[index - 7];
+        if (index > 7 && index < 16) {
+            pawn_moves_bitboard_lookup[0][index] |= single_index_bitboard_[index + 16];
+        }
+        if (index > 47 && index < 56) {
+            pawn_moves_bitboard_lookup[1][index] |= single_index_bitboard_[index - 16];
+        }
+        if (single_index_bitboard_[index] & a_file) {
+            pawn_moves_bitboard_lookup[0][index] &= ~h_file;
+            pawn_moves_bitboard_lookup[1][index] &= ~h_file;
+
+        }
+        if (single_index_bitboard_[index] & h_file) {
+            pawn_moves_bitboard_lookup[0][index] &= ~a_file; 
+            pawn_moves_bitboard_lookup[1][index] &= ~a_file; 
+        }
     }
 }
 
@@ -162,6 +195,12 @@ void BitBoardLookupTables::PrintAllBitboards() {
         PrintBitBoard(south_west_array_bitboard_lookup[i]);
         cout << "\tKNIGHT ATTACK\n\n";
         PrintBitBoard(knight_attack_bitboard_lookup[i]);
+        cout << "\tKING MOVES\n\n";
+        PrintBitBoard(king_move_bitboard_lookup[0][i]);
+        PrintBitBoard(king_move_bitboard_lookup[1][i]);
+        cout << "\tPAWN MOVES\n\n";
+        PrintBitBoard(pawn_moves_bitboard_lookup[0][i]);
+        PrintBitBoard(pawn_moves_bitboard_lookup[1][i]);
     }
 }
 

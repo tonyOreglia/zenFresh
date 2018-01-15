@@ -3,6 +3,8 @@
 #include <iostream>
 #include "position.h"
 #include "move.h"
+#include "./bitboard_utilities/bitboard-utilities.h"
+
 
 using namespace std;
 
@@ -87,10 +89,10 @@ void PrintHumanReadableBoard(Position& position) {
 }
 
 
-unsigned lsb_scan(uint64_t bitboard){
-    return __builtin_ctzll(bitboard);
-}
+// unsigned lsb_scan(uint64_t bitboard){
+//     return __builtin_ctzll(bitboard);
+// }
 
-unsigned msb_scan(uint64_t bitboard){
-    return 63 - __builtin_clzll(bitboard);
-}
+// unsigned msb_scan(uint64_t bitboard){
+//     return 63 - __builtin_clzll(bitboard);
+// }

@@ -12,6 +12,13 @@ Game::Game(Position position) : bitboard_lookup_(position.bitboard_lookup) {
 void Game::GenerateMoves(vector <Move>& move_list) {
     GenerateRookMoves(move_list);
     GenerateBishopMoves(move_list);
+    GenerateQueenMoves(move_list);
+    GenerateKnightMoves(move_list);
+    if (position.GetSideToMove() == WHITE) {
+        GenerateWhitePawnMoves(move_list);
+    } else {
+        GenerateBlackPawnMoves(move_list);
+    }
 }
 
 void Game::PushSingleMoveFromValidMovesBBToMovesVector(
@@ -30,13 +37,12 @@ void Game::PushSingleMoveFromValidMovesBBToMovesVector(
 }
 
 
-
 void Game::GenerateBishopMoves(vector <Move>& move_list) {
     uint64_t bishop_bitboard_copy = position.GetBishopsBitBoard();
 
     while(bishop_bitboard_copy) {
-        uint8_t bishop_position = lsb_scan(bishop_bitboard_copy);
-        bishop_bitboard_copy ^= position.bitboard_lookup.single_index_bitboard_[bishop_position];
+        uint8_t bishop_position = 
+            EjectIndexFromBitboard(bishop_bitboard_copy, position.bitboard_lookup.single_index_bitboard_);
         uint64_t valid_moves_bb = GenerateValidDiagonalSlidingMovesBB(bishop_position);
         valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
 
@@ -50,8 +56,8 @@ void Game::GenerateRookMoves(vector <Move>& move_list) {
     uint64_t rook_bitboard_copy = position.GetRooksBitBoard();
 
     while(rook_bitboard_copy) {
-        uint8_t rook_position = lsb_scan(rook_bitboard_copy);
-        rook_bitboard_copy ^= position.bitboard_lookup.single_index_bitboard_[rook_position];
+        uint8_t rook_position =
+            EjectIndexFromBitboard(rook_bitboard_copy, position.bitboard_lookup.single_index_bitboard_);
         uint64_t valid_moves_bb = GenerateValidStraightSlidingMovesBB(rook_position);
         valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
 
@@ -63,11 +69,146 @@ void Game::GenerateRookMoves(vector <Move>& move_list) {
     }
 }
 
+void Game::GenerateQueenMoves(vector <Move>& move_list) {
+    uint64_t queen_bitboard_copy = position.GetQueenBitBoard();
+    while(queen_bitboard_copy) {
+        uint8_t queen_position =
+            EjectIndexFromBitboard(queen_bitboard_copy, position.bitboard_lookup.single_index_bitboard_);
+        uint64_t valid_moves_bb =
+            GenerateValidStraightSlidingMovesBB(queen_position) |
+            GenerateValidDiagonalSlidingMovesBB(queen_position);
+        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
+        while(valid_moves_bb) {
+            PushSingleMoveFromValidMovesBBToMovesVector(queen_position, valid_moves_bb, move_list); 
+        }
+    }
+}
+
+void Game::GenerateKnightMoves(vector <Move>& move_list) {
+    uint64_t knight_bb_copy = position.GetKnightsBitBoard();
+    while(knight_bb_copy) {
+        uint8_t knight_position =
+            EjectIndexFromBitboard(knight_bb_copy, position.bitboard_lookup.single_index_bitboard_);
+        uint64_t valid_moves_bb = position.bitboard_lookup.knight_attack_bitboard_lookup[knight_position];
+        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
+        while(valid_moves_bb) {
+            PushSingleMoveFromValidMovesBBToMovesVector(knight_position, valid_moves_bb, move_list); 
+        }
+    }
+}
+
 void Game::GenerateKingMoves(vector <Move>& move_list) {
     // must check if Rook is on proper square for particular castling move.
     // this is better than checking every move if it captures a rook.
-    // Rook moves will kill castling ability, but rook captures will not.
+    // Rook moves will kill castling ability, but captures of rook will not.
+    uint64_t king_bb_copy = position.GetKingBitBoard();
+    uint8_t king_position = position.bitboard_lookup.single_index_bitboard_[king_bb_copy];
+    uint64_t valid_moves_bb =
+        position.bitboard_lookup.king_move_bitboard_lookup[position.GetSideToMove()][king_position];
+    valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
+    while(valid_moves_bb) {
+        PushSingleMoveFromValidMovesBBToMovesVector(king_position, valid_moves_bb, move_list); 
+        move_list.back().SetRemoveKingSideCastleRightsFlag();
+        move_list.back().SetRemoveQueenSideCastleRightsFlag();
+    }
 }
+
+void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
+    uint64_t pawn_bb_copy = position.GetPawnsBitBoard();
+
+    uint64_t valid_single_push_moves_bb = pawn_bb_copy << 8;
+    valid_single_push_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
+
+    while(valid_single_push_moves_bb) {
+        uint8_t destination_position = lsb_scan(valid_single_push_moves_bb);
+        valid_single_push_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position + 8, destination_position);
+        move_list.push_back(move);
+    }
+
+    uint64_t valid_double_push_pawn_moves_bb = pawn_bb_copy << 16;
+    valid_double_push_pawn_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
+
+    while(valid_double_push_pawn_moves_bb) {
+        uint8_t destination_position = lsb_scan(valid_double_push_pawn_moves_bb);
+        valid_double_push_pawn_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position + 16, destination_position);
+        move.SetDoublePawnPushFlag();
+        move_list.push_back(move);
+    }
+
+    uint64_t valid_pawn_attacks_right =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  << 7;
+    valid_pawn_attacks_right &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
+
+    while(valid_pawn_attacks_right) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_right);
+        valid_pawn_attacks_right ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position + 7, destination_position);
+        move.SetCaptureFlag();
+        move_list.push_back(move);
+    }
+
+    uint64_t valid_pawn_attacks_left =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  << 9;
+    valid_pawn_attacks_left &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
+
+    while(valid_pawn_attacks_left) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_left);
+        valid_pawn_attacks_left ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position + 9, destination_position);
+        move.SetCaptureFlag();
+        move_list.push_back(move);
+    } 
+}
+
+void Game::GenerateBlackPawnMoves(vector <Move>& move_list) {
+    uint64_t pawn_bb_copy = position.GetPawnsBitBoard();
+    uint64_t valid_single_push_moves_bb = pawn_bb_copy >> 8;
+    valid_single_push_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
+
+    while(valid_single_push_moves_bb) {
+        uint8_t destination_position = lsb_scan(valid_single_push_moves_bb);
+        valid_single_push_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position - 8, destination_position);
+        move_list.push_back(move);
+    }
+
+    uint64_t valid_double_push_pawn_moves_bb = pawn_bb_copy >> 16;
+    valid_double_push_pawn_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
+
+    while(valid_double_push_pawn_moves_bb) {
+        uint8_t destination_position = lsb_scan(valid_double_push_pawn_moves_bb);
+        valid_double_push_pawn_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position - 16, destination_position);
+        move.SetDoublePawnPushFlag();
+        move_list.push_back(move);
+    }
+
+    uint64_t valid_pawn_attacks_left =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 7;
+    valid_pawn_attacks_left &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
+
+    while(valid_pawn_attacks_left) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_left);
+        valid_pawn_attacks_left ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position - 7, destination_position);
+        move.SetCaptureFlag();
+        move_list.push_back(move);
+    }
+
+    uint64_t valid_pawn_attacks_right =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 9;
+    valid_pawn_attacks_right &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
+
+    while(valid_pawn_attacks_right) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_right);
+        valid_pawn_attacks_right ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position - 9, destination_position);
+        move_list.push_back(move);
+    }
+}
+
 
 uint64_t Game::GenerateValidMovesNorthBitboard(char index) {
     uint64_t bb_occupied_squares_overlap_with_north_array = 
