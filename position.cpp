@@ -5,6 +5,91 @@ Position::Position()
     SetStartingPosition();
 }
 
+Position::Position(char *fen, char *side_to_move, char *castling_rights, char *en_passant, char *half_move_ct, char *full_move_ct) {
+   
+    ClearPosition();
+
+    for(char i=0; i<strlen(fen); i++) {
+        char letter = fen[i];
+
+        switch (letter)
+        {
+            case 'p' : AddPieceToPawnsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'r' : AddPieceToRooksBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'n' : AddPieceToKnightsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'b' : AddPieceToBishopsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'q' : AddPieceToQueenBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'k' : AddPieceToKingBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'P' : AddPieceToPawnsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'R' : AddPieceToRooksBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'N' : AddPieceToKnightsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'B' : AddPieceToBishopsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'Q' : AddPieceToQueenBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
+            case 'K' : AddPieceToKingBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
+            case '/' : break;
+            case '1' : break;
+            case '2' : i++; break;
+            case '3' : i += 2; break;
+            case '4' : i += 3; break;
+            case '5' : i += 4; break;
+            case '6' : i += 5; break;
+            case '7' : i += 6; break;
+            case '8' : i += 7; break;
+        }
+
+    }
+    UpdateAggregateBitboardsFromPieceBitboards();
+
+    if(side_to_move[0] == 'w') SetSideToMove(WHITE);
+    else if(side_to_move[0] == 'b') SetSideToMove(BLACK);
+
+    for(char i=0; i<strlen(castling_rights); i++) {
+        char letter = castling_rights[i];
+        switch(letter) {
+            case 'K' : SetWhiteCanCastleKingSide(true); break;
+            case 'Q' : SetWhiteCanCastleQueenSide(true); break;
+            case 'k' : SetBlackCanCastleKingSide(true); break;
+            case 'q' : SetBlackCanCastleQueenSide(true); break;
+            case '-' : break;
+        }
+    }
+
+    if(en_passant[0] != '-')  {
+        int file = en_passant[0] - 97;    // 'a' = 0
+        int rank = en_passant[1]; // must be 3 or 6
+        int index_of_en_passant = (8 - rank) * 8 + file;
+        SetEnPassantBitBoard(bitboard_lookup.single_index_bitboard_[index_of_en_passant]);
+    }
+
+    SetHalfMoveCount(atoi(half_move_ct));
+    SetFullMoveCount(atoi(full_move_ct));
+}
+
+void Position::ClearPosition() {
+    SetKingBitBoard(BLACK, 0ULL);
+    SetQueenBitBoard(BLACK, 0ULL);
+    SetBishopsBitBoard(BLACK, 0ULL);
+    SetKnightsBitBoard(BLACK, 0ULL);
+    SetRooksBitBoard(BLACK, 0ULL);
+    SetPawnsBitBoard(BLACK, 0ULL);
+    SetKingBitBoard(WHITE, 0ULL);
+    SetQueenBitBoard(WHITE, 0ULL);
+    SetBishopsBitBoard(WHITE, 0ULL);
+    SetKnightsBitBoard(WHITE, 0ULL);
+    SetRooksBitBoard(WHITE, 0ULL);
+    SetPawnsBitBoard(WHITE, 0ULL);
+    SetEnPassantBitBoard(0ULL);
+
+    SetWhiteCanCastleKingSide(false);
+    SetWhiteCanCastleQueenSide(false);
+    SetBlackCanCastleKingSide(false);
+    SetBlackCanCastleQueenSide(false);
+
+    SetHalfMoveCount(0);
+    SetFullMoveCount(0);
+}
+
+
 /**
     Set Position class to the position at the start of a chess game.
 */

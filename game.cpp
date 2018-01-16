@@ -184,7 +184,7 @@ void Game::GenerateBlackPawnMoves(vector <Move>& move_list) {
         move.SetDoublePawnPushFlag();
         move_list.push_back(move);
     }
-
+    // need to check for en passant capturing for all pawn attack moves
     uint64_t valid_pawn_attacks_left =
         (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 7;
     valid_pawn_attacks_left &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
