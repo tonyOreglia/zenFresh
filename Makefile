@@ -3,27 +3,28 @@ CC = g++
 DEBUG = -g
 CFLAGS = -c $(DEBUG)
 LFLAGS = $(DEBUG)
+ISO = -std=c++11
 
 testing-classes : $(OBJS) 
-	$(CC) $(LFLAGS) $(OBJS) -o zen
+	$(CC) $(LFLAGS) $(OBJS) $(ISO) -o zen
 
 position.o : position.h position.cpp move.h ./bitboard_utilities/generate-bitboard-lookup-tables.h
-	$(CC) $(CFLAGS) position.cpp
+	$(CC) $(CFLAGS) $(ISO) position.cpp
 
 move.o : move.h move.cpp ./bitboard_utilities/bitboard-utilities.h
-	$(CC) $(CFLAGS) move.cpp
+	$(CC) $(CFLAGS) $(ISO) move.cpp
 
 game.o : game.h game.cpp move.h position.h ./bitboard_utilities/bitboard-utilities.h ./bitboard_utilities/generate-bitboard-lookup-tables.h
-	$(CC) $(CFLAGS) game.cpp
+	$(CC) $(CFLAGS) $(ISO) game.cpp
 
 testing-classes.o : position.h move.h ./bitboard_utilities/bitboard-utilities.h
-	$(CC) $(CFLAGS) testing-classes.cpp
+	$(CC) $(CFLAGS) $(ISO) testing-classes.cpp
 
 bitboard-utilities.o :
-	$(CC) $(CFLAGS) ./bitboard_utilities/bitboard-utilities.cpp
+	$(CC) $(CFLAGS) $(ISO) ./bitboard_utilities/bitboard-utilities.cpp
 
 generate-bitboard-lookup-tables.o :
-	$(CC) $(CFLAGS) ./bitboard_utilities/generate-bitboard-lookup-tables.cpp
+	$(CC) $(CFLAGS) $(ISO) ./bitboard_utilities/generate-bitboard-lookup-tables.cpp
 
 clean:
 	\rm *.o *~ zen

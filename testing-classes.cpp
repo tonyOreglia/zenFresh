@@ -18,14 +18,31 @@ void storeBitboardInPiecesArray(char *pieces, uint64_t bitboard, char pieceChara
 void PrintHumanReadableBoardFromPiecesArray(char *pieces);
 
 int main(int argc, char *argv[]) {
+    // Position position(
+    //     (char *)"rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R",
+    //     (char *)"b",
+    //     (char *)"KQkq",
+    //     (char *)"-",
+    //     (char *)"1",
+    //     (char *)"2"
+    // );
+    // Position position(
+    //     (char *)"4k3/8/8/8/8/8/4P3/4K3",
+    //     (char *)"w",
+    //     (char *)"-",
+    //     (char *)"-",
+    //     (char *)"5",
+    //     (char *)"39"
+    // );
+
     Position position;
     PrintHumanReadableBoard(position);
-    Move move;
-    move.SetOriginSquare(E2);
-    move.SetDestinationSquare(E4);
-    move.SetDoublePawnPushFlag();
-    position.UpdatePositionWithSingleMove(move);
-    PrintHumanReadableBoard(position);
+    // Move move;
+    // move.SetOriginSquare(E2);
+    // move.SetDestinationSquare(E4);
+    // move.SetDoublePawnPushFlag();
+    // position.UpdatePositionWithSingleMove(move);
+    // PrintHumanReadableBoard(position);
     return 0;
 }
 

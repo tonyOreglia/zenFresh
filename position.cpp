@@ -1,44 +1,55 @@
 #include "position.h"
 
-Position::Position()
-{
-    SetStartingPosition();
-}
+// Position::Position()
+// {
+//     SetStartingPosition();
+// }
 
 Position::Position(char *fen, char *side_to_move, char *castling_rights, char *en_passant, char *half_move_ct, char *full_move_ct) {
    
     ClearPosition();
 
-    for(char i=0; i<strlen(fen); i++) {
-        char letter = fen[i];
+    cout << "I'm here in fen import\n";
+    PrintBitBoard(bitboard_.all_occupied_squares);
+    cout << strlen(fen) << endl;
+    char board_location = 0;
 
+    for(short fen_index=0; fen_index<strlen(fen); fen_index++) {
+        char letter = fen[fen_index];
+        cout << letter << endl;
         switch (letter)
         {
-            case 'p' : AddPieceToPawnsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'r' : AddPieceToRooksBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'n' : AddPieceToKnightsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'b' : AddPieceToBishopsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'q' : AddPieceToQueenBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'k' : AddPieceToKingBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'P' : AddPieceToPawnsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'R' : AddPieceToRooksBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'N' : AddPieceToKnightsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'B' : AddPieceToBishopsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'Q' : AddPieceToQueenBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
-            case 'K' : AddPieceToKingBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[i]); break;
-            case '/' : break;
+            case 'p' : AddPieceToPawnsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'r' : AddPieceToRooksBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'n' : AddPieceToKnightsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'b' : AddPieceToBishopsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'q' : AddPieceToQueenBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'k' : AddPieceToKingBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'P' : AddPieceToPawnsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'R' : AddPieceToRooksBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'N' : AddPieceToKnightsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'B' : AddPieceToBishopsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'Q' : AddPieceToQueenBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'K' : AddPieceToKingBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case '/' : board_location--; break;
             case '1' : break;
-            case '2' : i++; break;
-            case '3' : i += 2; break;
-            case '4' : i += 3; break;
-            case '5' : i += 4; break;
-            case '6' : i += 5; break;
-            case '7' : i += 6; break;
-            case '8' : i += 7; break;
+            case '2' : board_location += 1; break;
+            case '3' : board_location += 2; break;
+            case '4' : board_location += 3; break;
+            case '5' : board_location += 4; break;
+            case '6' : board_location += 5; break;
+            case '7' : board_location += 6; break;
+            case '8' : board_location += 7; break;
+            default: break;
         }
-
+        board_location++;
     }
+
+
     UpdateAggregateBitboardsFromPieceBitboards();
+
+    PrintBitBoard(bitboard_.all_occupied_squares);
+
 
     if(side_to_move[0] == 'w') SetSideToMove(WHITE);
     else if(side_to_move[0] == 'b') SetSideToMove(BLACK);
