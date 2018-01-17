@@ -14,7 +14,7 @@ testing-classes : $(OBJS)
 catch2-unit-testing : $(TEST)
 	$(CC) $(LFLAGS) $(TEST) $(ISO) -o test
 
-catch2-unit-testing.o : position.h game.h move.h bitboard_utilities/bitboard-utilities.h bitboard_utilities/generate-bitboard-lookup-tables.h
+catch2-unit-testing.o : catch2-unit-testing.cpp position.h game.h move.h bitboard_utilities/bitboard-utilities.h bitboard_utilities/generate-bitboard-lookup-tables.h
 	$(CC) $(CFLAGS) $(ISO) catch2-unit-testing.cpp
 
 position.o : position.h position.cpp move.h ./bitboard_utilities/generate-bitboard-lookup-tables.h

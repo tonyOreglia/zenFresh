@@ -1,22 +1,12 @@
 #include "position.h"
 
-// Position::Position()
-// {
-//     SetStartingPosition();
-// }
-
 Position::Position(char *fen, char *side_to_move, char *castling_rights, char *en_passant, char *half_move_ct, char *full_move_ct) {
    
     ClearPosition();
-
-    cout << "I'm here in fen import\n";
-    PrintBitBoard(bitboard_.all_occupied_squares);
-    cout << strlen(fen) << endl;
     char board_location = 0;
 
     for(short fen_index=0; fen_index<strlen(fen); fen_index++) {
         char letter = fen[fen_index];
-        cout << letter << endl;
         switch (letter)
         {
             case 'p' : AddPieceToPawnsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
@@ -47,9 +37,6 @@ Position::Position(char *fen, char *side_to_move, char *castling_rights, char *e
 
 
     UpdateAggregateBitboardsFromPieceBitboards();
-
-    PrintBitBoard(bitboard_.all_occupied_squares);
-
 
     if(side_to_move[0] == 'w') SetSideToMove(WHITE);
     else if(side_to_move[0] == 'b') SetSideToMove(BLACK);

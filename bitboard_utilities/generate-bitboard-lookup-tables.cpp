@@ -26,7 +26,7 @@ BitBoardLookupTables::BitBoardLookupTables() {
     GenerateSingleBitLookup();
     GenerateArrayBitboardLookup();
     GenerateEnPassantBitboardLookup();
-    PrintAllBitboards();
+    // PrintAllBitboards();
 }
 
 void BitBoardLookupTables::GenerateSingleBitLookup() {
