@@ -2,6 +2,7 @@
 #include <bitset>
 #include <iostream>
 #include "position.h"
+#include "game.h"
 #include "move.h"
 #include "./bitboard_utilities/bitboard-utilities.h"
 
@@ -36,7 +37,17 @@ int main(int argc, char *argv[]) {
     // );
 
     Position position;
-    PrintHumanReadableBoard(position);
+    Game game(position);
+    vector <Move> movesList = game.GetMovesVector(0);
+    game.GenerateMoves(movesList);
+    cout << "move cnt: " << movesList.size() << endl;
+    for(vector<Move>::iterator it = movesList.begin(); it != movesList.end(); ++it) {
+        // it->PrintMove();
+        position.UpdatePositionWithSingleMove(*it);
+        PrintHumanReadableBoard(position);
+        position.SetStartingPosition();
+    }
+
     // Move move;
     // move.SetOriginSquare(E2);
     // move.SetDestinationSquare(E4);

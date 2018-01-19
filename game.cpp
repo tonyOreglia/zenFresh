@@ -116,9 +116,13 @@ void Game::GenerateKingMoves(vector <Move>& move_list) {
 void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
     uint64_t pawn_bb_copy = position.GetPawnsBitBoard();
 
-    uint64_t valid_single_push_moves_bb = pawn_bb_copy << 8;
-    valid_single_push_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
+    // position.PrintBitBoard(pawn_bb_copy);
 
+    uint64_t valid_single_push_moves_bb = pawn_bb_copy >> 8;
+    // position.PrintBitBoard(valid_single_push_moves_bb);
+    valid_single_push_moves_bb ^= (valid_single_push_moves_bb & position.GetAllOccupiedSquaresBitBoard());
+
+    // position.PrintBitBoard(valid_single_push_moves_bb);
     while(valid_single_push_moves_bb) {
         uint8_t destination_position = lsb_scan(valid_single_push_moves_bb);
         valid_single_push_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
@@ -126,8 +130,8 @@ void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
         move_list.push_back(move);
     }
 
-    uint64_t valid_double_push_pawn_moves_bb = pawn_bb_copy << 16;
-    valid_double_push_pawn_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
+    uint64_t valid_double_push_pawn_moves_bb = pawn_bb_copy >> 16;
+    valid_double_push_pawn_moves_bb ^= (valid_double_push_pawn_moves_bb & position.GetAllOccupiedSquaresBitBoard());
 
     while(valid_double_push_pawn_moves_bb) {
         uint8_t destination_position = lsb_scan(valid_double_push_pawn_moves_bb);

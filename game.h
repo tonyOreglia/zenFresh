@@ -38,6 +38,7 @@ public:
     uint64_t GenerateValidMovesSouthWestBitboard(char index);
     uint64_t GenerateValidDiagonalSlidingMovesBB(char index);
     uint64_t GenerateValidStraightSlidingMovesBB(char index);
+    vector <Move> &GetMovesVector(short depth) { return potential_moves_[depth]; }
 private:
     Position position;
     BitBoardLookupTables& bitboard_lookup_;

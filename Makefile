@@ -26,7 +26,7 @@ move.o : move.h move.cpp ./bitboard_utilities/bitboard-utilities.h
 game.o : game.h game.cpp move.h position.h ./bitboard_utilities/bitboard-utilities.h ./bitboard_utilities/generate-bitboard-lookup-tables.h
 	$(CC) $(CFLAGS) $(ISO) game.cpp
 
-testing-classes.o : position.h move.h ./bitboard_utilities/bitboard-utilities.h
+testing-classes.o : testing-classes.cpp position.h move.h ./bitboard_utilities/bitboard-utilities.h
 	$(CC) $(CFLAGS) $(ISO) testing-classes.cpp
 
 bitboard-utilities.o :
