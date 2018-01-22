@@ -156,6 +156,13 @@ uint64_t* Position::GetPieceBitboardBasedOnBoardLocation(uint64_t board_location
 */
 void Position::UpdateMovingPieceBitboardWithSingleMove(uint64_t origin_bitboard, uint64_t destination_bitboard) {
     uint64_t* moving_piece_bitboard = GetPieceBitboardBasedOnBoardLocation(origin_bitboard, side_to_move_);
+    if (!moving_piece_bitboard) {
+        cout << "got a null pointer\n";
+        cout << "origin bb: \n";
+        PrintBitBoard(origin_bitboard);
+        cout << "destination bb: \n";
+        PrintBitBoard(destination_bitboard);
+    } 
     ToggleBitboardBits(*moving_piece_bitboard, origin_bitboard | destination_bitboard);
 }
 
@@ -174,13 +181,22 @@ void Position::ToggleBitboardBits(uint64_t& piece_bitboard, uint64_t toggle_posi
  * @param (Move&) Reference to class representing a single chess move.
 */
 void Position::UpdatePositionWithSingleMove(Move& move) {
+    cout << "UpdatePositionWithSingleMove\n";
     uint16_t origin_sq = move.GetOriginSquare();
     uint16_t destination_sq = move.GetDestinationSquare();
+
+    cout << "origin sq: " << origin_sq << endl;
+    cout << "dest sq: " << destination_sq << endl;
     uint64_t origin_bitboard = 1ULL << origin_sq;
     uint64_t destination_bitboard = 1ULL << destination_sq;
 
-    UpdateMovingPieceBitboardWithSingleMove(origin_bitboard, destination_bitboard);
+    cout << "origin bb: \n";
+    PrintBitBoard(origin_bitboard);
 
+    cout << "dest bb: \n";
+    PrintBitBoard(destination_bitboard);
+
+    UpdateMovingPieceBitboardWithSingleMove(origin_bitboard, destination_bitboard);
     if (move.IsDoublePawnPush()) {
         bitboard_.en_passante = 
             bitboard_lookup.en_passant_bitboad_lookup_by_pawn_destination[destination_sq];

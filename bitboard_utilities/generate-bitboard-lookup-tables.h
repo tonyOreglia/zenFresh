@@ -39,6 +39,9 @@ public:
     uint64_t f_file;
     uint64_t g_file;
     uint64_t h_file;
+
+    uint64_t fourth_rank;
+    uint64_t fifth_rank;
 };
 
 #endif

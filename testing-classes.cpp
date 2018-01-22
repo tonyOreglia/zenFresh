@@ -36,24 +36,46 @@ int main(int argc, char *argv[]) {
     //     (char *)"39"
     // );
 
-    Position position;
+    // Position position(
+    //     (char *)"r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R",
+    //     (char *)"w",
+    //     (char *)"KQkq",
+    //     (char *)"-",
+    //     (char *)"1",
+    //     (char *)"1"
+    // );
+    // Position starting = position;
+
+    Position position(
+        (char *)"k7/8/8/3B4/8/8/8/K7",
+        (char *)"w",
+        (char *)"KQkq",
+        (char *)"-",
+        (char *)"1",
+        (char *)"1"
+    );
+
+    // Position position(
+    //     (char *)"8/8/8/8/8/2r2R2/PPPPPPPP/8",
+    //     (char *)"w",
+    //     (char *)"KQkq",
+    //     (char *)"-",
+    //     (char *)"1",
+    //     (char *)"1"
+    // );
+
+    Position starting = position;
+    // Position position;
     Game game(position);
     vector <Move> movesList = game.GetMovesVector(0);
     game.GenerateMoves(movesList);
     cout << "move cnt: " << movesList.size() << endl;
     for(vector<Move>::iterator it = movesList.begin(); it != movesList.end(); ++it) {
-        // it->PrintMove();
         position.UpdatePositionWithSingleMove(*it);
         PrintHumanReadableBoard(position);
-        position.SetStartingPosition();
+        // position.SetStartingPosition();
+        position = starting;
     }
-
-    // Move move;
-    // move.SetOriginSquare(E2);
-    // move.SetDestinationSquare(E4);
-    // move.SetDoublePawnPushFlag();
-    // position.UpdatePositionWithSingleMove(move);
-    // PrintHumanReadableBoard(position);
     return 0;
 }
 
@@ -115,12 +137,3 @@ void PrintHumanReadableBoard(Position& position) {
 
     PrintHumanReadableBoardFromPiecesArray(pieces);
 }
-
-
-// unsigned lsb_scan(uint64_t bitboard){
-//     return __builtin_ctzll(bitboard);
-// }
-
-// unsigned msb_scan(uint64_t bitboard){
-//     return 63 - __builtin_clzll(bitboard);
-// }

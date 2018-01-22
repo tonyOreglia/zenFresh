@@ -29,10 +29,10 @@ game.o : game.h game.cpp move.h position.h ./bitboard_utilities/bitboard-utiliti
 testing-classes.o : testing-classes.cpp position.h move.h ./bitboard_utilities/bitboard-utilities.h
 	$(CC) $(CFLAGS) $(ISO) testing-classes.cpp
 
-bitboard-utilities.o :
+bitboard-utilities.o : ./bitboard_utilities/bitboard-utilities.cpp ./bitboard_utilities/bitboard-utilities.h
 	$(CC) $(CFLAGS) $(ISO) ./bitboard_utilities/bitboard-utilities.cpp
 
-generate-bitboard-lookup-tables.o :
+generate-bitboard-lookup-tables.o : ./bitboard_utilities/generate-bitboard-lookup-tables.cpp ./bitboard_utilities/generate-bitboard-lookup-tables.h
 	$(CC) $(CFLAGS) $(ISO) ./bitboard_utilities/generate-bitboard-lookup-tables.cpp
 
 clean:

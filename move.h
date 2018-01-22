@@ -48,7 +48,7 @@ private:
 public:
     Move() { move_ = 0; }
     Move(uint16_t move) { move_ = move; }
-    Move(uint8_t origin, uint8_t destination) { move_ = origin << 10 | destination << 4; }
+    Move(short origin, short destination) { move_ = origin << 10 | destination << 4; }
     void SetOriginSquare(uint8_t origin) { move_ |= (origin << 10); }
     void SetDestinationSquare(uint8_t destination) { move_ |= (destination << 4); }
     void SetDoublePawnPushFlag() { move_ |= SPECIAL_2_MASK; }

@@ -10,6 +10,10 @@ BitBoardLookupTables::BitBoardLookupTables() {
     f_file = a_file << 5;
     g_file = a_file << 6;
     h_file = a_file << 7;
+
+    fourth_rank = 0xFF00000000ULL;
+    fifth_rank = 0xFF000000ULL;
+
     for (int index = 0; index < 64; index++) {
         en_passant_bitboad_lookup_by_pawn_destination[index] = 0ULL;
         attacked_pawn_location_for_en_passant_capture[index] = 0ULL;

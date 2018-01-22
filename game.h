@@ -25,7 +25,7 @@ public:
     void GenerateWhitePawnMoves(vector <Move>& move_list);
     void GenerateBlackPawnMoves(vector <Move>& move_list);
     void PushSingleMoveFromValidMovesBBToMovesVector(
-        uint8_t origin,
+        short origin,
         uint64_t &valid_moves_bb,
         vector <Move>& move_list);
     uint64_t GenerateValidMovesNorthBitboard(char index);
