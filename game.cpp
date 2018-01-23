@@ -30,9 +30,6 @@ void Game::PushSingleMoveFromValidMovesBBToMovesVector(
     ) {
     short destination_position = lsb_scan(valid_moves_bb);
     valid_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
-    cout << "PushSingleMoveFromValidMovesBBToMovesVector\n";
-    cout << "pushing move with origin sq: " << origin_square;
-    cout << " and dest sq: " << destination_position << endl;
     Move move(origin_square, destination_position);
     if (
         bitboard_lookup_.single_index_bitboard_[destination_position] &
@@ -44,16 +41,11 @@ void Game::PushSingleMoveFromValidMovesBBToMovesVector(
 
 void Game::GenerateBishopMoves(vector <Move>& move_list) {
     uint64_t bishop_bitboard_copy = position.GetBishopsBitBoard();
-    cout << "bishop bb: \n";
-    position.PrintBitBoard(bishop_bitboard_copy);
 
     while(bishop_bitboard_copy) {
         short bishop_position =
             EjectIndexFromBitboard(bishop_bitboard_copy, position.bitboard_lookup.single_index_bitboard_);
-        cout << "bishop pos: \n" << bishop_position << endl;
         uint64_t valid_moves_bb = GenerateValidDiagonalSlidingMovesBB(bishop_position);
-        cout << "valid moves bb: \n";
-        position.PrintBitBoard(valid_moves_bb);
         valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
 
         while(valid_moves_bb) {

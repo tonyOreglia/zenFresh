@@ -73,7 +73,6 @@ int main(int argc, char *argv[]) {
     for(vector<Move>::iterator it = movesList.begin(); it != movesList.end(); ++it) {
         position.UpdatePositionWithSingleMove(*it);
         PrintHumanReadableBoard(position);
-        // position.SetStartingPosition();
         position = starting;
     }
     return 0;
