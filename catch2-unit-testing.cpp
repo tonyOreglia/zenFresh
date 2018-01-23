@@ -27,3 +27,49 @@ TEST_CASE( "Validate starting position", "[position]" ) {
         REQUIRE( position.GetPawnsBitBoard(WHITE) == 0xFF000000000000 );
     }
 }
+
+TEST_CASE("Basic Rook Movement", "[movement]") {
+    Position position(
+        (char *)"k7/8/8/3R4/8/8/8/K7",
+        (char *)"w",
+        (char *)"----",
+        (char *)"-",
+        (char *)"1",
+        (char *)"1"
+    );
+    SECTION("Number of moves is 17") {
+        Game game(position);
+        vector <Move> moves_list = game.GetMovesVector(0);
+        game.GenerateMoves(moves_list);
+        REQUIRE( moves_list.size() == 17 );
+    }
+}
+/**
+ * Things I can test
+ * 
+ * Movement
+ * * For each piece
+ * * * rook
+ * * * queen
+ * * * king
+ * * * bishop
+ * * * knight
+ * * * pawn
+ * * Attacks
+ * * castling
+ * * pawn movement
+ * * * attacking pawns
+ * * * en pasant
+ * * * double pawn push
+ * 
+ * Position
+ * * Starting position (X)
+ * * illegal positions
+ * * castling rights
+ * * move counts
+ * 
+ * Move Generation
+ * * perft
+ * 
+ * 
+ **/
