@@ -46,9 +46,18 @@ int main(int argc, char *argv[]) {
     // );
     // Position starting = position;
 
+    // Position position(
+    //     (char *)"k7/8/8/3B4/8/8/8/K7",
+    //     (char *)"w",
+    //     (char *)"KQkq",
+    //     (char *)"-",
+    //     (char *)"1",
+    //     (char *)"1"
+    // );
+
     Position position(
-        (char *)"k7/8/8/3B4/8/8/8/K7",
-        (char *)"w",
+        (char *)"4k3/8/8/8/8/8/8/4K3",
+        (char *)"b",
         (char *)"KQkq",
         (char *)"-",
         (char *)"1",

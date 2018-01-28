@@ -9,6 +9,7 @@
 #include <bitset>
 #include <iostream>
 #include <stack>
+#include <stdlib.h>
 
 #include "move.h"
 #include "./bitboard_utilities/generate-bitboard-lookup-tables.h"

@@ -53,12 +53,12 @@ Position::Position(char *fen, char *side_to_move, char *castling_rights, char *e
     }
 
     if(en_passant[0] != '-')  {
-        int file = en_passant[0] - 97;    // 'a' = 0
-        int rank = en_passant[1]; // must be 3 or 6
-        int index_of_en_passant = (8 - rank) * 8 + file;
+        int file = en_passant[0] - 97;    // 'a' --> 0
+        char * rank_string = &en_passant[1];
+        int rank_number = atoi(rank_string);
+        int index_of_en_passant = ( 8 - rank_number ) * 8 + file;
         SetEnPassantBitBoard(bitboard_lookup.single_index_bitboard_[index_of_en_passant]);
     }
-
     SetHalfMoveCount(atoi(half_move_ct));
     SetFullMoveCount(atoi(full_move_ct));
 }

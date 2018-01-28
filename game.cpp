@@ -112,13 +112,17 @@ void Game::GenerateKingMoves(vector <Move>& move_list) {
     valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
     while(valid_moves_bb) {
         PushSingleMoveFromValidMovesBBToMovesVector(king_position, valid_moves_bb, move_list); 
+        move_list.back().PrintMove();
         move_list.back().SetRemoveKingSideCastleRightsFlag();
         move_list.back().SetRemoveQueenSideCastleRightsFlag();
     }
+    cout << "move cnt: " << move_list.size() << endl;
 }
 
 void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
     uint64_t pawn_bb_copy = position.GetPawnsBitBoard();
+    cout << "pawn bb: \n";
+    position.PrintBitBoard(pawn_bb_copy);
     uint64_t valid_single_push_moves_bb = pawn_bb_copy >> 8;
     valid_single_push_moves_bb ^= (valid_single_push_moves_bb & position.GetAllOccupiedSquaresBitBoard());
     uint64_t valid_double_push_pawn_moves_bb = (valid_single_push_moves_bb >> 8) & position.bitboard_lookup.fourth_rank;
@@ -140,45 +144,47 @@ void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
         move_list.push_back(move);
     }
 
-    // uint64_t valid_pawn_attacks_right =
-    //     (pawn_bb_copy & ~bitboard_lookup_.a_file)  << 7;
-    // valid_pawn_attacks_right &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
+    uint64_t valid_pawn_attacks_right =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 7;
+    valid_pawn_attacks_right &=
+        position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard();
 
-    // while(valid_pawn_attacks_right) {
-    //     uint8_t destination_position = lsb_scan(valid_pawn_attacks_right);
-    //     valid_pawn_attacks_right ^= bitboard_lookup_.single_index_bitboard_[destination_position];
-    //     Move move(destination_position + 7, destination_position);
-    //     move.SetCaptureFlag();
-    //     move_list.push_back(move);
-    // }
+    while(valid_pawn_attacks_right) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_right);
+        valid_pawn_attacks_right ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position + 7, destination_position);
+        move.SetCaptureFlag();
+        move_list.push_back(move);
+    }
 
-    // uint64_t valid_pawn_attacks_left =
-    //     (pawn_bb_copy & ~bitboard_lookup_.a_file)  << 9;
-    // valid_pawn_attacks_left &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
+    uint64_t valid_pawn_attacks_left =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 9;
+    valid_pawn_attacks_left &=
+        position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard();
 
-    // while(valid_pawn_attacks_left) {
-    //     uint8_t destination_position = lsb_scan(valid_pawn_attacks_left);
-    //     valid_pawn_attacks_left ^= bitboard_lookup_.single_index_bitboard_[destination_position];
-    //     Move move(destination_position + 9, destination_position);
-    //     move.SetCaptureFlag();
-    //     move_list.push_back(move);
-    // } 
+    while(valid_pawn_attacks_left) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_left);
+        valid_pawn_attacks_left ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+        Move move(destination_position + 9, destination_position);
+        move.SetCaptureFlag();
+        move_list.push_back(move);
+    } 
 }
 
 void Game::GenerateBlackPawnMoves(vector <Move>& move_list) {
     uint64_t pawn_bb_copy = position.GetPawnsBitBoard();
-    uint64_t valid_single_push_moves_bb = pawn_bb_copy >> 8;
-    valid_single_push_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
+    uint64_t valid_single_push_moves_bb = pawn_bb_copy << 8;
+    valid_single_push_moves_bb ^= (valid_single_push_moves_bb & position.GetAllOccupiedSquaresBitBoard());
+    uint64_t valid_double_push_pawn_moves_bb = (valid_single_push_moves_bb << 8) & position.bitboard_lookup.fourth_rank;
+    valid_double_push_pawn_moves_bb ^= (valid_double_push_pawn_moves_bb & position.GetAllOccupiedSquaresBitBoard());
 
+    // position.PrintBitBoard(valid_single_push_moves_bb);
     while(valid_single_push_moves_bb) {
         uint8_t destination_position = lsb_scan(valid_single_push_moves_bb);
         valid_single_push_moves_bb ^= bitboard_lookup_.single_index_bitboard_[destination_position];
         Move move(destination_position - 8, destination_position);
         move_list.push_back(move);
     }
-
-    uint64_t valid_double_push_pawn_moves_bb = pawn_bb_copy >> 16;
-    valid_double_push_pawn_moves_bb ^= position.GetAllOccupiedSquaresBitBoard();
 
     while(valid_double_push_pawn_moves_bb) {
         uint8_t destination_position = lsb_scan(valid_double_push_pawn_moves_bb);
@@ -187,29 +193,32 @@ void Game::GenerateBlackPawnMoves(vector <Move>& move_list) {
         move.SetDoublePawnPushFlag();
         move_list.push_back(move);
     }
-    // need to check for en passant capturing for all pawn attack moves
-    uint64_t valid_pawn_attacks_left =
-        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 7;
-    valid_pawn_attacks_left &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
 
-    while(valid_pawn_attacks_left) {
-        uint8_t destination_position = lsb_scan(valid_pawn_attacks_left);
-        valid_pawn_attacks_left ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+    uint64_t valid_pawn_attacks_right =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  << 7;
+    valid_pawn_attacks_right &=
+        position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard();
+
+    while(valid_pawn_attacks_right) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_right);
+        valid_pawn_attacks_right ^= bitboard_lookup_.single_index_bitboard_[destination_position];
         Move move(destination_position - 7, destination_position);
         move.SetCaptureFlag();
         move_list.push_back(move);
     }
 
-    uint64_t valid_pawn_attacks_right =
-        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 9;
-    valid_pawn_attacks_right &= position.GetOccupiedSquaresBitBoard(!position.GetSideToMove());
+    uint64_t valid_pawn_attacks_left =
+        (pawn_bb_copy & ~bitboard_lookup_.a_file)  << 9;
+    valid_pawn_attacks_left &=
+        position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard();
 
-    while(valid_pawn_attacks_right) {
-        uint8_t destination_position = lsb_scan(valid_pawn_attacks_right);
-        valid_pawn_attacks_right ^= bitboard_lookup_.single_index_bitboard_[destination_position];
+    while(valid_pawn_attacks_left) {
+        uint8_t destination_position = lsb_scan(valid_pawn_attacks_left);
+        valid_pawn_attacks_left ^= bitboard_lookup_.single_index_bitboard_[destination_position];
         Move move(destination_position - 9, destination_position);
+        move.SetCaptureFlag();
         move_list.push_back(move);
-    }
+    } 
 }
 
 
@@ -328,3 +337,19 @@ uint64_t Game::GenerateValidStraightSlidingMovesBB(char index) {
             GenerateValidMovesSouthBitboard(index) |
             GenerateValidMovesWestBitboard(index));
 }
+
+uint64_t Game::PerformanceTest(short depth) {
+    short current_depth = 0;
+    uint64_t total_number_of_potential_moves = 0ULL;
+    while (current_depth < depth) {
+        GenerateMoves(potential_moves_[current_depth]);
+        total_number_of_potential_moves += potential_moves_[current_depth].size();
+        current_depth++;
+    }
+}
+
+
+
+
+
+
