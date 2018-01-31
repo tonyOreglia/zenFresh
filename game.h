@@ -38,14 +38,12 @@ public:
     uint64_t GenerateValidMovesSouthWestBitboard(char index);
     uint64_t GenerateValidDiagonalSlidingMovesBB(char index);
     uint64_t GenerateValidStraightSlidingMovesBB(char index);
-    uint64_t PerfTest(short depth);
+    uint64_t PerformanceTest(short depth);
     vector <Move> &GetMovesVector(short depth) { return potential_moves_[depth]; }
 private:
     Position position;
     BitBoardLookupTables& bitboard_lookup_;
     vector <Move> game_history;
     vector <Move> *potential_moves_;
-
 };
-
 #endif

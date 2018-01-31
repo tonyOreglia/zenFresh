@@ -10,6 +10,7 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
+#include <array>
 
 #include "move.h"
 #include "./bitboard_utilities/generate-bitboard-lookup-tables.h"
@@ -59,7 +60,6 @@ private:
         uint64_t all_occupied_squares;
         PieceBitboards piece_bitboards [2];
     } bitboard_;
-    std::stack<uint64_t*> captured_pieces;
 public:
     Position() : Position(
         (char *)"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", (char *)"w", (char *)"KQkq", (char *)"-", (char *)"0", (char *)"1" 
@@ -67,8 +67,9 @@ public:
     Position(char *fen, char *side_to_move, char *castling_rights, char *en_passant, char *fifty_move, char *full_moves);
     void SetStartingPosition();
     void ClearPosition();
-    void UpdatePositionWithSingleMove(Move& move);
+    void MakeMove(Move& move);
     void UpdateMovingPieceBitboardWithSingleMove(uint64_t origin_bitboard, uint64_t destination_bitboard);
+    void UnmakeMove(Move& move);
     uint64_t* GetPieceBitboardBasedOnBoardLocation(uint64_t board_location_bitboard, bool side_to_check);
     void ToggleBitboardBits(uint64_t& piece_bitboard, uint64_t toggle_positions);
 

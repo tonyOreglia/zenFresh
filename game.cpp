@@ -41,13 +41,18 @@ void Game::PushSingleMoveFromValidMovesBBToMovesVector(
 
 void Game::GenerateBishopMoves(vector <Move>& move_list) {
     uint64_t bishop_bitboard_copy = position.GetBishopsBitBoard();
+    cout << "bishop bb: \n";
+    position.PrintBitBoard(bishop_bitboard_copy);
 
     while(bishop_bitboard_copy) {
-        short bishop_position =
+        uint8_t bishop_position =
             EjectIndexFromBitboard(bishop_bitboard_copy, position.bitboard_lookup.single_index_bitboard_);
+        cout << "bishop pos: " << (int)bishop_position << endl;
         uint64_t valid_moves_bb = GenerateValidDiagonalSlidingMovesBB(bishop_position);
-        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
 
+        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
+        cout << "valid moves bb: \n";
+        position.PrintBitBoard(valid_moves_bb);   
         while(valid_moves_bb) {
             PushSingleMoveFromValidMovesBBToMovesVector(bishop_position, valid_moves_bb, move_list);
         }
@@ -338,18 +343,12 @@ uint64_t Game::GenerateValidStraightSlidingMovesBB(char index) {
             GenerateValidMovesWestBitboard(index));
 }
 
-uint64_t Game::PerformanceTest(short depth) {
-    short current_depth = 0;
-    uint64_t total_number_of_potential_moves = 0ULL;
-    while (current_depth < depth) {
-        GenerateMoves(potential_moves_[current_depth]);
-        total_number_of_potential_moves += potential_moves_[current_depth].size();
-        current_depth++;
-    }
-}
-
-
-
-
-
-
+// uint64_t Game::PerformanceTest(short depth) {
+//     short current_depth = 0;
+//     uint64_t total_number_of_potential_moves = 0ULL;
+//     while (current_depth < depth) {
+//         GenerateMoves(potential_moves_[current_depth]);
+//         total_number_of_potential_moves += potential_moves_[current_depth].size();
+//         current_depth++;
+//     }
+// }

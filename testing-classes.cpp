@@ -55,14 +55,14 @@ int main(int argc, char *argv[]) {
     //     (char *)"1"
     // );
 
-    Position position(
-        (char *)"4k3/8/8/8/8/8/8/4K3",
-        (char *)"b",
-        (char *)"KQkq",
-        (char *)"-",
-        (char *)"1",
-        (char *)"1"
-    );
+    // Position position(
+    //     (char *)"4k3/8/8/8/8/8/8/4K3",
+    //     (char *)"b",
+    //     (char *)"KQkq",
+    //     (char *)"-",
+    //     (char *)"1",
+    //     (char *)"1"
+    // );
 
     // Position position(
     //     (char *)"8/8/8/8/8/2r2R2/PPPPPPPP/8",
@@ -72,6 +72,7 @@ int main(int argc, char *argv[]) {
     //     (char *)"1",
     //     (char *)"1"
     // );
+    Position position;
 
     Position starting = position;
     // Position position;
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]) {
     game.GenerateMoves(movesList);
     cout << "move cnt: " << movesList.size() << endl;
     for(vector<Move>::iterator it = movesList.begin(); it != movesList.end(); ++it) {
-        position.UpdatePositionWithSingleMove(*it);
+        position.MakeMove(*it);
         PrintHumanReadableBoard(position);
         position = starting;
     }

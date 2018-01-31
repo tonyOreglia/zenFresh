@@ -174,7 +174,7 @@ void Position::ToggleBitboardBits(uint64_t& piece_bitboard, uint64_t toggle_posi
  * Update instance of Position class with a single move.
  * @param (Move&) Reference to class representing a single chess move.
 */
-void Position::UpdatePositionWithSingleMove(Move& move) {
+void Position::MakeMove(Move& move) {
     uint16_t origin_sq = move.GetOriginSquare();
     uint16_t destination_sq = move.GetDestinationSquare();
     uint64_t origin_bitboard = 1ULL << origin_sq;
@@ -193,7 +193,7 @@ void Position::UpdatePositionWithSingleMove(Move& move) {
             GetPieceBitboardBasedOnBoardLocation(destination_bitboard, !side_to_move_);
         ToggleBitboardBits(*captured_piece_bitboard, destination_bitboard);
         // this is used when reversing move to add the captured piece back.
-        captured_pieces.push(captured_piece_bitboard);
+        // captured_pieces.push(captured_piece_bitboard);
     }
     
     // only update aggregate bitboards after updating moving piece bitboards, and
@@ -221,6 +221,10 @@ void Position::UpdatePositionWithSingleMove(Move& move) {
     } else if (move.RemoveQueenSideCastlingRights()) {
         castling_rights_[side_to_move_][QUEEN_SIDE_CASTLE] = false;
     }
+}
+
+void Position::UnmakeMove(Move& move) {
+
 }
 
 /**
