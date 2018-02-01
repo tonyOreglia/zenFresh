@@ -72,17 +72,26 @@ int main(int argc, char *argv[]) {
     //     (char *)"1",
     //     (char *)"1"
     // );
-    Position position;
+   Position position(
+        (char *)"k7/8/8/1P6/8/3r1R2/P1PPPPPP/7K",
+        (char *)"w",
+        (char *)"----",
+        (char *)"a6",
+        (char *)"1",
+        (char *)"1"
+    );
 
     Position starting = position;
     // Position position;
     Game game(position);
     vector <Move> movesList = game.GetMovesVector(0);
     game.GenerateMoves(movesList);
-    cout << "move cnt: " << movesList.size() << endl;
+    cout << movesList.size() << " moves generated.\n";
     for(vector<Move>::iterator it = movesList.begin(); it != movesList.end(); ++it) {
         position.MakeMove(*it);
+        it->PrintMove();
         PrintHumanReadableBoard(position);
+        cout << "move cnt: " << movesList.size() << endl;
         position = starting;
     }
     return 0;

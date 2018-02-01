@@ -18,7 +18,7 @@ public:
     void PrintAllBitboards();
     void PrintBitBoard(uint64_t bitboard);
     uint64_t single_index_bitboard_[64]; // look up single bit bitboard by index
-    uint64_t en_passant_bitboad_lookup_by_pawn_destination[64];
+    uint64_t en_passant_location_bb_after_double_pawn_push_bb[64];
     uint64_t attacked_pawn_location_for_en_passant_capture[64];
     uint64_t north_array_bitboard_lookup[64];
     uint64_t south_array_bitboard_lookup[64];

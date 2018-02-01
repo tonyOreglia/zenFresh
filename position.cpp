@@ -53,10 +53,12 @@ Position::Position(char *fen, char *side_to_move, char *castling_rights, char *e
     }
 
     if(en_passant[0] != '-')  {
-        int file = en_passant[0] - 97;    // 'a' --> 0
+        // 'a' --> 0, 'b' --> 1, etc. 
+        int file = en_passant[0] - 97;
         char * rank_string = &en_passant[1];
         int rank_number = atoi(rank_string);
         int index_of_en_passant = ( 8 - rank_number ) * 8 + file;
+        // cout << "en passant: " << index_of_en_passant << endl;
         SetEnPassantBitBoard(bitboard_lookup.single_index_bitboard_[index_of_en_passant]);
     }
     SetHalfMoveCount(atoi(half_move_ct));
@@ -183,7 +185,7 @@ void Position::MakeMove(Move& move) {
     UpdateMovingPieceBitboardWithSingleMove(origin_bitboard, destination_bitboard);
     if (move.IsDoublePawnPush()) {
         bitboard_.en_passante = 
-            bitboard_lookup.en_passant_bitboad_lookup_by_pawn_destination[destination_sq];
+            bitboard_lookup.en_passant_location_bb_after_double_pawn_push_bb[destination_sq];
     }
     if (move.IsEnPassantCapture()) {
         ToggleBitboardBits(bitboard_.piece_bitboards[!side_to_move_].pawns,
@@ -191,7 +193,9 @@ void Position::MakeMove(Move& move) {
     } else if (move.IsCapture()) {
         uint64_t* captured_piece_bitboard =
             GetPieceBitboardBasedOnBoardLocation(destination_bitboard, !side_to_move_);
-        ToggleBitboardBits(*captured_piece_bitboard, destination_bitboard);
+        // in the case of en passant capture this be a null pointer
+        if (captured_piece_bitboard)
+            ToggleBitboardBits(*captured_piece_bitboard, destination_bitboard);
         // this is used when reversing move to add the captured piece back.
         // captured_pieces.push(captured_piece_bitboard);
     }

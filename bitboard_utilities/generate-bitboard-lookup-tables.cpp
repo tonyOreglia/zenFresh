@@ -15,7 +15,7 @@ BitBoardLookupTables::BitBoardLookupTables() {
     fifth_rank = 0xFF000000ULL;
 
     for (int index = 0; index < 64; index++) {
-        en_passant_bitboad_lookup_by_pawn_destination[index] = 0ULL;
+        en_passant_location_bb_after_double_pawn_push_bb[index] = 0ULL;
         attacked_pawn_location_for_en_passant_capture[index] = 0ULL;
         north_array_bitboard_lookup[index] = 0ULL;
         south_array_bitboard_lookup[index] = 0ULL;
@@ -30,7 +30,7 @@ BitBoardLookupTables::BitBoardLookupTables() {
     GenerateSingleBitLookup();
     GenerateArrayBitboardLookup();
     GenerateEnPassantBitboardLookup();
-    PrintAllBitboards();
+    // PrintAllBitboards();
 }
 
 void BitBoardLookupTables::GenerateSingleBitLookup() {
@@ -41,16 +41,17 @@ void BitBoardLookupTables::GenerateSingleBitLookup() {
 
 void BitBoardLookupTables::GenerateEnPassantBitboardLookup() {
     for (char i=0; i<64; i++) {
-        en_passant_bitboad_lookup_by_pawn_destination[i] = 0ULL;
+        en_passant_location_bb_after_double_pawn_push_bb[i] = 0ULL;
+        attacked_pawn_location_for_en_passant_capture[i] = 0ULL;
         if (i > 23 && i < 32) {
-            en_passant_bitboad_lookup_by_pawn_destination[i] = single_index_bitboard_[i - 8];
+            en_passant_location_bb_after_double_pawn_push_bb[i] = single_index_bitboard_[i - 8];
         }
         else if (i > 31 && i < 40) {
-            en_passant_bitboad_lookup_by_pawn_destination[i] = single_index_bitboard_[i + 8];
+            en_passant_location_bb_after_double_pawn_push_bb[i] = single_index_bitboard_[i + 8];
         } else if (i > 15 && i < 24) {
-            attacked_pawn_location_for_en_passant_capture[i] = single_index_bitboard_[i+8];
+            attacked_pawn_location_for_en_passant_capture[i] = single_index_bitboard_[i + 8];
         } else if (i > 39 && i < 48) {
-            attacked_pawn_location_for_en_passant_capture[i] = single_index_bitboard_[i+8];
+            attacked_pawn_location_for_en_passant_capture[i] = single_index_bitboard_[i - 8];
         }
     }
 }
@@ -114,12 +115,15 @@ void BitBoardLookupTables::GenerateArrayBitboardLookup() {
         if( (index - 15) >= 0 && !(single_index_bitboard_[index] & h_file))
             { knight_attack_bitboard_lookup[index] |= single_index_bitboard_[index - 15]; }
         
-        // all the following need to take into acount edge moves :((((
-        king_move_bitboard_lookup[0][index] =
-            single_index_bitboard_[index + 1] | single_index_bitboard_[index - 1] |
-            single_index_bitboard_[index + 8] | single_index_bitboard_[index - 8] |
-            single_index_bitboard_[index + 9] | single_index_bitboard_[index - 9] |
-            single_index_bitboard_[index + 7] | single_index_bitboard_[index - 7];
+        king_move_bitboard_lookup[0][index] = 0ULL;
+        if (index != 63) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index + 1];
+        if (index != 0) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index - 1];
+        if (index <= 55) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index + 8];
+        if (index >= 8) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index - 8];
+        if (index <= 54) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index + 9];
+        if (index >= 9) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index - 9];
+        if (index <= 56) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index + 7];
+        if (index >= 7) king_move_bitboard_lookup[0][index] |= single_index_bitboard_[index - 7];
         king_move_bitboard_lookup[1][index] = king_move_bitboard_lookup[0][index];
         if (single_index_bitboard_[index] & a_file) {
             king_move_bitboard_lookup[0][index] &= ~h_file;
@@ -139,10 +143,17 @@ void BitBoardLookupTables::GenerateArrayBitboardLookup() {
             }
 
         // PAWN MOVE
-        pawn_moves_bitboard_lookup[0][index] = single_index_bitboard_[index + 8] |
-            single_index_bitboard_[index + 9] | single_index_bitboard_[index + 7];
-        pawn_moves_bitboard_lookup[1][index] = single_index_bitboard_[index - 8] |
-            single_index_bitboard_[index - 9] | single_index_bitboard_[index - 7];
+        pawn_moves_bitboard_lookup[0][index] = 0ULL;
+        pawn_moves_bitboard_lookup[1][index] = 0ULL;
+
+        if (index <= 56) pawn_moves_bitboard_lookup[0][index] |= single_index_bitboard_[index + 7];
+        if (index <= 55) pawn_moves_bitboard_lookup[0][index] |= single_index_bitboard_[index + 8];
+        if (index <= 54) pawn_moves_bitboard_lookup[0][index] |= single_index_bitboard_[index + 9];
+
+        if (index >= 7) pawn_moves_bitboard_lookup[1][index] |= single_index_bitboard_[index - 7];
+        if (index >= 8) pawn_moves_bitboard_lookup[1][index] |= single_index_bitboard_[index - 8];
+        if (index >= 9) pawn_moves_bitboard_lookup[1][index] |= single_index_bitboard_[index - 9];
+       
         if (index > 7 && index < 16) {
             pawn_moves_bitboard_lookup[0][index] |= single_index_bitboard_[index + 16];
         }
@@ -205,6 +216,10 @@ void BitBoardLookupTables::PrintAllBitboards() {
         cout << "\tPAWN MOVES\n\n";
         PrintBitBoard(pawn_moves_bitboard_lookup[0][i]);
         PrintBitBoard(pawn_moves_bitboard_lookup[1][i]);
+        cout << "\tEN PASSANT BB LOOKUP BY PAWN DESTINATION: " << (int)i << endl;
+        PrintBitBoard(en_passant_location_bb_after_double_pawn_push_bb[i]);
+        cout << "\tATTACKED PAWN LOCATION BY EN PASSANT CAPTURE: " << (int)i << endl;
+        PrintBitBoard(attacked_pawn_location_for_en_passant_capture[i]);
     }
 }
 

@@ -2,7 +2,6 @@
 
 Game::Game(Position position) : bitboard_lookup_(position.bitboard_lookup) {
     this->position = position;
-    bitboard_lookup_ = position.bitboard_lookup;
     potential_moves_ = new vector<Move>[DEPTH];
     for (char i = 0; i < DEPTH; i++) {
         potential_moves_[i].reserve(MAX_MOVES_FROM_SINGLE_POSITION);
@@ -41,18 +40,13 @@ void Game::PushSingleMoveFromValidMovesBBToMovesVector(
 
 void Game::GenerateBishopMoves(vector <Move>& move_list) {
     uint64_t bishop_bitboard_copy = position.GetBishopsBitBoard();
-    cout << "bishop bb: \n";
-    position.PrintBitBoard(bishop_bitboard_copy);
 
     while(bishop_bitboard_copy) {
         uint8_t bishop_position =
             EjectIndexFromBitboard(bishop_bitboard_copy, position.bitboard_lookup.single_index_bitboard_);
-        cout << "bishop pos: " << (int)bishop_position << endl;
         uint64_t valid_moves_bb = GenerateValidDiagonalSlidingMovesBB(bishop_position);
 
-        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
-        cout << "valid moves bb: \n";
-        position.PrintBitBoard(valid_moves_bb);   
+        valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB(); 
         while(valid_moves_bb) {
             PushSingleMoveFromValidMovesBBToMovesVector(bishop_position, valid_moves_bb, move_list);
         }
@@ -117,17 +111,13 @@ void Game::GenerateKingMoves(vector <Move>& move_list) {
     valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
     while(valid_moves_bb) {
         PushSingleMoveFromValidMovesBBToMovesVector(king_position, valid_moves_bb, move_list); 
-        move_list.back().PrintMove();
         move_list.back().SetRemoveKingSideCastleRightsFlag();
         move_list.back().SetRemoveQueenSideCastleRightsFlag();
     }
-    cout << "move cnt: " << move_list.size() << endl;
 }
 
 void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
     uint64_t pawn_bb_copy = position.GetPawnsBitBoard();
-    cout << "pawn bb: \n";
-    position.PrintBitBoard(pawn_bb_copy);
     uint64_t valid_single_push_moves_bb = pawn_bb_copy >> 8;
     valid_single_push_moves_bb ^= (valid_single_push_moves_bb & position.GetAllOccupiedSquaresBitBoard());
     uint64_t valid_double_push_pawn_moves_bb = (valid_single_push_moves_bb >> 8) & position.bitboard_lookup.fourth_rank;
@@ -150,9 +140,9 @@ void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
     }
 
     uint64_t valid_pawn_attacks_right =
-        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 7;
+        (pawn_bb_copy & ~bitboard_lookup_.h_file) >> 7;
     valid_pawn_attacks_right &=
-        position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard();
+        (position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard());
 
     while(valid_pawn_attacks_right) {
         uint8_t destination_position = lsb_scan(valid_pawn_attacks_right);
@@ -163,9 +153,9 @@ void Game::GenerateWhitePawnMoves(vector <Move>& move_list) {
     }
 
     uint64_t valid_pawn_attacks_left =
-        (pawn_bb_copy & ~bitboard_lookup_.a_file)  >> 9;
+        (pawn_bb_copy & ~bitboard_lookup_.a_file) >> 9;
     valid_pawn_attacks_left &=
-        position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard();
+        (position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard());
 
     while(valid_pawn_attacks_left) {
         uint8_t destination_position = lsb_scan(valid_pawn_attacks_left);

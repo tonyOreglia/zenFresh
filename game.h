@@ -42,7 +42,9 @@ public:
     vector <Move> &GetMovesVector(short depth) { return potential_moves_[depth]; }
 private:
     Position position;
-    BitBoardLookupTables& bitboard_lookup_;
+    // there is something wrong with this and it is causing the a_file bb to be funky as shit.
+    // out of scope????
+    BitBoardLookupTables &bitboard_lookup_;
     vector <Move> game_history;
     vector <Move> *potential_moves_;
 };
