@@ -5,6 +5,7 @@
 #include "game.h"
 #include "move.h"
 #include "./bitboard_utilities/bitboard-utilities.h"
+#include "./bitboard_utilities/generate-bitboard-lookup-tables.h"
 
 
 using namespace std;
@@ -72,15 +73,18 @@ int main(int argc, char *argv[]) {
     //     (char *)"1",
     //     (char *)"1"
     // );
-   Position position(
-        (char *)"k7/8/8/1P6/8/3r1R2/P1PPPPPP/7K",
-        (char *)"w",
-        (char *)"----",
-        (char *)"a6",
-        (char *)"1",
-        (char *)"1"
-    );
+    calculateAllLookupBbs();
 
+    Position position(
+            (char *)"k7/8/8/1P6/8/3r1R2/P1PPPPPP/7K",
+            (char *)"w",
+            (char *)"----",
+            (char *)"a6",
+            (char *)"1",
+            (char *)"1"
+        );
+
+    
     Position starting = position;
     // Position position;
     Game game(position);

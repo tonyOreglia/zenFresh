@@ -121,7 +121,6 @@ public:
     void SetFullMoveCount(short full_move_count) { full_move_count_ = full_move_count; }
 
     void PrintBitBoard(uint64_t bitboard);
-    BitBoardLookupTables bitboard_lookup;
 };
 
 #endif

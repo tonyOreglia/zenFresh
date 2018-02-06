@@ -44,7 +44,7 @@ private:
     Position position;
     // there is something wrong with this and it is causing the a_file bb to be funky as shit.
     // out of scope????
-    BitBoardLookupTables &bitboard_lookup_;
+    // BitBoardLookupTables &bitboard_lookup_;
     vector <Move> game_history;
     vector <Move> *potential_moves_;
 };

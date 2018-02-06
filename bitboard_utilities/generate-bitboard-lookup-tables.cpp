@@ -1,18 +1,33 @@
 #include "generate-bitboard-lookup-tables.h"
 
+uint64_t a_file = 0x101010101010101ULL;
+uint64_t b_file = a_file << 1;
+uint64_t c_file = a_file << 2;
+uint64_t d_file = a_file << 3;
+uint64_t e_file = a_file << 4;
+uint64_t f_file = a_file << 5;
+uint64_t g_file = a_file << 6;
+uint64_t h_file = a_file << 7;
 
-BitBoardLookupTables::BitBoardLookupTables() {
-    a_file = 0x101010101010101ULL;
-    b_file = a_file << 1;
-    c_file = a_file << 2;
-    d_file = a_file << 3;
-    e_file = a_file << 4;
-    f_file = a_file << 5;
-    g_file = a_file << 6;
-    h_file = a_file << 7;
+uint64_t single_index_bitboard_[64];
+uint64_t en_passant_location_bb_after_double_pawn_push_bb[64];
+uint64_t attacked_pawn_location_for_en_passant_capture[64];
+uint64_t north_array_bitboard_lookup[64];
+uint64_t south_array_bitboard_lookup[64];
+uint64_t east_array_bitboard_lookup[64];
+uint64_t west_array_bitboard_lookup[64];
+uint64_t north_east_array_bitboard_lookup[64];
+uint64_t north_west_array_bitboard_lookup[64];
+uint64_t south_east_array_bitboard_lookup[64];
+uint64_t south_west_array_bitboard_lookup[64];
+uint64_t knight_attack_bitboard_lookup[64];
+uint64_t king_move_bitboard_lookup[2][64]; // one for white one for black   
+uint64_t pawn_moves_bitboard_lookup[2][64];
 
-    fourth_rank = 0xFF00000000ULL;
-    fifth_rank = 0xFF000000ULL;
+uint64_t fourth_rank = 0xFF00000000ULL;
+uint64_t fifth_rank = 0xFF000000ULL;
+
+void calculateAllLookupBbs() {
 
     for (int index = 0; index < 64; index++) {
         en_passant_location_bb_after_double_pawn_push_bb[index] = 0ULL;
@@ -27,19 +42,19 @@ BitBoardLookupTables::BitBoardLookupTables() {
         south_west_array_bitboard_lookup[index] = 0ULL;
         knight_attack_bitboard_lookup[index] = 0ULL;
     }
-    GenerateSingleBitLookup();
-    GenerateArrayBitboardLookup();
-    GenerateEnPassantBitboardLookup();
+    generateSingleBitLookup();
+    generateArrayBitboardLookup();
+    generateEnPassantBitboardLookup();
     // PrintAllBitboards();
 }
 
-void BitBoardLookupTables::GenerateSingleBitLookup() {
+void generateSingleBitLookup() {
     for (int i=0; i<64; i++) {
         single_index_bitboard_[i] = 1ULL << i;
     }
 }
 
-void BitBoardLookupTables::GenerateEnPassantBitboardLookup() {
+void generateEnPassantBitboardLookup() {
     for (char i=0; i<64; i++) {
         en_passant_location_bb_after_double_pawn_push_bb[i] = 0ULL;
         attacked_pawn_location_for_en_passant_capture[i] = 0ULL;
@@ -56,7 +71,7 @@ void BitBoardLookupTables::GenerateEnPassantBitboardLookup() {
     }
 }
 
-void BitBoardLookupTables::GenerateArrayBitboardLookup() {
+void generateArrayBitboardLookup() {
     for (int index=0; index<64; index++) {
         int north_of_index = index;
         while (north_of_index > 7) {
@@ -172,58 +187,58 @@ void BitBoardLookupTables::GenerateArrayBitboardLookup() {
     }
 }
 
-void BitBoardLookupTables::PrintAllBitboards() {
+void printAllBitboards() {
     cout << "\tA FILE\n\n";
-    PrintBitBoard(a_file);
+    printBitBoard(a_file);
     cout << "\tB FILE\n\n";
-    PrintBitBoard(b_file);
+    printBitBoard(b_file);
     cout << "\tC FILE\n\n";
-    PrintBitBoard(c_file);
+    printBitBoard(c_file);
     cout << "\tD FILE\n\n";
-    PrintBitBoard(d_file);
+    printBitBoard(d_file);
     cout << "\tE FILE\n\n";
-    PrintBitBoard(e_file);
+    printBitBoard(e_file);
     cout << "\tF FILE\n\n";
-    PrintBitBoard(f_file);
+    printBitBoard(f_file);
     cout << "\tG FILE\n\n";
-    PrintBitBoard(g_file);
+    printBitBoard(g_file);
     cout << "\tH FILE\n\n";
-    PrintBitBoard(h_file);
+    printBitBoard(h_file);
     for (char i=0; i<64; i++) {
         cout << "\tBITBOARD LOOKUP\n\n";
-        PrintBitBoard(single_index_bitboard_[i]);
+        printBitBoard(single_index_bitboard_[i]);
         cout << "\tNORTH\n\n";
-        PrintBitBoard(north_array_bitboard_lookup[i]);
+        printBitBoard(north_array_bitboard_lookup[i]);
         cout << "\tSOUTH\n\n";
-        PrintBitBoard(south_array_bitboard_lookup[i]);
+        printBitBoard(south_array_bitboard_lookup[i]);
         cout << "\tEAST\n\n";
-        PrintBitBoard(east_array_bitboard_lookup[i]);
+        printBitBoard(east_array_bitboard_lookup[i]);
         cout << "\tWEST\n\n";
-        PrintBitBoard(west_array_bitboard_lookup[i]);
+        printBitBoard(west_array_bitboard_lookup[i]);
         cout << "\tNORTH EAST\n\n";
-        PrintBitBoard(north_east_array_bitboard_lookup[i]);
+        printBitBoard(north_east_array_bitboard_lookup[i]);
         cout << "\tNORTH WEST\n\n";
-        PrintBitBoard(north_west_array_bitboard_lookup[i]);
+        printBitBoard(north_west_array_bitboard_lookup[i]);
         cout << "\tSOUTH EAST\n\n";
-        PrintBitBoard(south_east_array_bitboard_lookup[i]);
+        printBitBoard(south_east_array_bitboard_lookup[i]);
         cout << "\tSOUTH WEST\n\n";
-        PrintBitBoard(south_west_array_bitboard_lookup[i]);
+        printBitBoard(south_west_array_bitboard_lookup[i]);
         cout << "\tKNIGHT ATTACK\n\n";
-        PrintBitBoard(knight_attack_bitboard_lookup[i]);
+        printBitBoard(knight_attack_bitboard_lookup[i]);
         cout << "\tKING MOVES\n\n";
-        PrintBitBoard(king_move_bitboard_lookup[0][i]);
-        PrintBitBoard(king_move_bitboard_lookup[1][i]);
+        printBitBoard(king_move_bitboard_lookup[0][i]);
+        printBitBoard(king_move_bitboard_lookup[1][i]);
         cout << "\tPAWN MOVES\n\n";
-        PrintBitBoard(pawn_moves_bitboard_lookup[0][i]);
-        PrintBitBoard(pawn_moves_bitboard_lookup[1][i]);
+        printBitBoard(pawn_moves_bitboard_lookup[0][i]);
+        printBitBoard(pawn_moves_bitboard_lookup[1][i]);
         cout << "\tEN PASSANT BB LOOKUP BY PAWN DESTINATION: " << (int)i << endl;
-        PrintBitBoard(en_passant_location_bb_after_double_pawn_push_bb[i]);
+        printBitBoard(en_passant_location_bb_after_double_pawn_push_bb[i]);
         cout << "\tATTACKED PAWN LOCATION BY EN PASSANT CAPTURE: " << (int)i << endl;
-        PrintBitBoard(attacked_pawn_location_for_en_passant_capture[i]);
+        printBitBoard(attacked_pawn_location_for_en_passant_capture[i]);
     }
 }
 
-void BitBoardLookupTables::PrintBitBoard(uint64_t bitboard) {
+void printBitBoard(uint64_t bitboard) {
     bitset<64> bb (bitboard);
     for(int i=0;i<64;i++) {
         cout << bb[i];

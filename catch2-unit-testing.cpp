@@ -8,6 +8,7 @@
 #include "./bitboard_utilities/generate-bitboard-lookup-tables.h"
 
 TEST_CASE( "Validate starting position", "[position]" ) {
+    calculateAllLookupBbs();
     Position position;
     SECTION("Blacks starting position should match expectation") {
         REQUIRE( position.GetKingBitBoard(BLACK) == 1ULL << 4 );
@@ -36,6 +37,7 @@ TEST_CASE( "Validate starting position", "[position]" ) {
 }
 
 TEST_CASE("Basic Rook Movement", "[movement]") {
+    calculateAllLookupBbs();
     Position position(
         (char *)"k7/8/3r4/3R4/3P4/8/8/K7",
         (char *)"w",
@@ -53,6 +55,7 @@ TEST_CASE("Basic Rook Movement", "[movement]") {
 }
 
 TEST_CASE("Basic Bishop Movement", "[movement]") {
+    calculateAllLookupBbs();
     Position position(
         (char *)"k7/8/8/3B4/4P3/8/8/K7",
         (char *)"w",
@@ -70,6 +73,7 @@ TEST_CASE("Basic Bishop Movement", "[movement]") {
 }
 
 TEST_CASE("Basic Queen Movement", "[movement]") {
+    calculateAllLookupBbs();
     Position position(
         (char *)"k7/8/3r4/3Q4/3P4/8/8/K7",
         (char *)"w",
@@ -87,6 +91,7 @@ TEST_CASE("Basic Queen Movement", "[movement]") {
 }
 
 TEST_CASE("Basic King Movement", "[movement]") {
+    calculateAllLookupBbs();
     Position position(
         (char *)"8/8/3k4/8/3r4/3K4/3P4/8",
         (char *)"w",
@@ -133,6 +138,7 @@ TEST_CASE("Basic King Movement", "[movement]") {
 }
 
 TEST_CASE("Basic Knight Movement", "[movement]") {
+    calculateAllLookupBbs();
     Position position(
         (char *)"k7/8/1r6/3N4/1P6/8/8/K7",
         (char *)"w",
@@ -150,6 +156,7 @@ TEST_CASE("Basic Knight Movement", "[movement]") {
 }
 
 TEST_CASE("Basic Pawn Movement", "[movement]") {
+    calculateAllLookupBbs();
     Position position(
         (char *)"k7/8/8/1P6/8/3r1R2/P1PPPPPP/7K",
         (char *)"w",

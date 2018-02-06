@@ -9,18 +9,18 @@ Position::Position(char *fen, char *side_to_move, char *castling_rights, char *e
         char letter = fen[fen_index];
         switch (letter)
         {
-            case 'p' : AddPieceToPawnsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'r' : AddPieceToRooksBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'n' : AddPieceToKnightsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'b' : AddPieceToBishopsBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'q' : AddPieceToQueenBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'k' : AddPieceToKingBitBoard(BLACK, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'P' : AddPieceToPawnsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'R' : AddPieceToRooksBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'N' : AddPieceToKnightsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'B' : AddPieceToBishopsBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'Q' : AddPieceToQueenBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
-            case 'K' : AddPieceToKingBitBoard(WHITE, bitboard_lookup.single_index_bitboard_[board_location]); break;
+            case 'p' : AddPieceToPawnsBitBoard(BLACK, single_index_bitboard_[board_location]); break;
+            case 'r' : AddPieceToRooksBitBoard(BLACK, single_index_bitboard_[board_location]); break;
+            case 'n' : AddPieceToKnightsBitBoard(BLACK, single_index_bitboard_[board_location]); break;
+            case 'b' : AddPieceToBishopsBitBoard(BLACK, single_index_bitboard_[board_location]); break;
+            case 'q' : AddPieceToQueenBitBoard(BLACK, single_index_bitboard_[board_location]); break;
+            case 'k' : AddPieceToKingBitBoard(BLACK, single_index_bitboard_[board_location]); break;
+            case 'P' : AddPieceToPawnsBitBoard(WHITE, single_index_bitboard_[board_location]); break;
+            case 'R' : AddPieceToRooksBitBoard(WHITE, single_index_bitboard_[board_location]); break;
+            case 'N' : AddPieceToKnightsBitBoard(WHITE, single_index_bitboard_[board_location]); break;
+            case 'B' : AddPieceToBishopsBitBoard(WHITE, single_index_bitboard_[board_location]); break;
+            case 'Q' : AddPieceToQueenBitBoard(WHITE, single_index_bitboard_[board_location]); break;
+            case 'K' : AddPieceToKingBitBoard(WHITE, single_index_bitboard_[board_location]); break;
             case '/' : board_location--; break;
             case '1' : break;
             case '2' : board_location += 1; break;
@@ -59,7 +59,7 @@ Position::Position(char *fen, char *side_to_move, char *castling_rights, char *e
         int rank_number = atoi(rank_string);
         int index_of_en_passant = ( 8 - rank_number ) * 8 + file;
         // cout << "en passant: " << index_of_en_passant << endl;
-        SetEnPassantBitBoard(bitboard_lookup.single_index_bitboard_[index_of_en_passant]);
+        SetEnPassantBitBoard(single_index_bitboard_[index_of_en_passant]);
     }
     SetHalfMoveCount(atoi(half_move_ct));
     SetFullMoveCount(atoi(full_move_ct));
@@ -185,11 +185,11 @@ void Position::MakeMove(Move& move) {
     UpdateMovingPieceBitboardWithSingleMove(origin_bitboard, destination_bitboard);
     if (move.IsDoublePawnPush()) {
         bitboard_.en_passante = 
-            bitboard_lookup.en_passant_location_bb_after_double_pawn_push_bb[destination_sq];
+            en_passant_location_bb_after_double_pawn_push_bb[destination_sq];
     }
     if (move.IsEnPassantCapture()) {
         ToggleBitboardBits(bitboard_.piece_bitboards[!side_to_move_].pawns,
-            bitboard_lookup.attacked_pawn_location_for_en_passant_capture[destination_sq]);
+            attacked_pawn_location_for_en_passant_capture[destination_sq]);
     } else if (move.IsCapture()) {
         uint64_t* captured_piece_bitboard =
             GetPieceBitboardBasedOnBoardLocation(destination_bitboard, !side_to_move_);
