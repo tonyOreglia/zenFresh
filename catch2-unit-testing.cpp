@@ -36,6 +36,72 @@ TEST_CASE( "Validate starting position", "[position]" ) {
     }
 }
 
+TEST_CASE("Move class -- accessor and mutator functions") {
+    SECTION("set and get origin square functions") {
+        Move move;
+        move.SetOriginSquare(1);
+        REQUIRE(move.GetOriginSquare() == 1);
+    }
+    SECTION("set and get destination square functions") {
+        Move move;
+        move.SetDestinationSquare(63);
+        REQUIRE(move.GetDestinationSquare() == 63);
+    }
+    SECTION("set and get double pawn push flag functions") {
+        Move move;
+        move.SetDoublePawnPushFlag();
+        REQUIRE(!!move.IsDoublePawnPush() == true);
+        Move move2;
+        REQUIRE(!!move2.IsDoublePawnPush() == false);
+    }
+    SECTION("set and get capture flag") {
+        Move move;
+        move.SetCaptureFlag();
+        REQUIRE(!!move.IsCapture() == true);
+        Move move2;
+        REQUIRE(!!move2.IsCapture() == false);
+    }
+    SECTION("set and get promotion flag") {
+        Move move;
+        move.SetPromotionFlag();
+        REQUIRE(!!move.IsPromotion() == true);
+        Move move2;
+        REQUIRE(!!move2.IsPromotion() == false);
+    }
+    SECTION("remove castling flags") {
+        Move move;
+        move.SetRemoveKingSideCastleRightsFlag();
+        move.SetRemoveQueenSideCastleRightsFlag();
+        REQUIRE(move.RemoveKingSideCastlingRights() == true);
+        REQUIRE(move.RemoveQueenSideCastlingRights() == true);
+    }
+    SECTION("en passant capture flag") {
+        Move move;
+        move.SetEnPassantCaptureFlag();
+        REQUIRE(move.IsEnPassantCapture() == true);
+    }
+    SECTION("promot pawn to queen") {
+        Move move;
+        move.SetPromotionPieceToQueen();
+        REQUIRE(move.PromotePawnToQueen() == true);
+    }
+    SECTION("promote pawn to rook") {
+        Move move;
+        move.SetPromotionPieceToRook();
+        REQUIRE(move.PromotePawnToRook() == true);
+    }
+    SECTION("promote pawn to knight") {
+        Move move;
+        move.SetPromotionPieceToKnight();
+        REQUIRE(move.PromotePawnToKnight() == true);
+    }
+    SECTION("promote pawn to bishop") {
+        Move move;
+        move.SetPromotionPieceToBishop();
+        REQUIRE(move.PromotePawnToBishop() == true);
+    }
+}
+
 TEST_CASE("Basic Rook Movement", "[movement]") {
     calculateAllLookupBbs();
     Position position(
@@ -189,15 +255,15 @@ TEST_CASE("Basic Pawn Movement", "[movement]") {
  * * Attacks (X)
  * * castling
  * * pawn movement
- * * * attacking pawns
- * * * en pasant
- * * * double pawn push
+ * * * attacking pawns (X)
+ * * * en pasant (X)
+ * * * double pawn push (X)
  * 
  * Position
  * * Starting position (X)
- * * illegal positions
- * * castling rights
- * * move counts
+ * * illegal positions 
+ * * castling rights (X)
+ * * move counts (X)
  * 
  * Move Generation
  * * perft

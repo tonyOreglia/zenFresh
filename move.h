@@ -67,9 +67,9 @@ public:
     bool IsDoublePawnPush() { return (move_ & FLAGS_MASK) == 1; }
     bool IsCapture() { return (bool)(move_ & CAPTURE_MASK); }
     bool IsPromotion() { return  (bool)(move_ & PROMOTION_MASK); }
-    bool RemoveKingSideCastlingRights() { return (move_ & FLAGS_MASK) == 2; }
-    bool RemoveQueenSideCastlingRights() { return (move_ & FLAGS_MASK) == 3; }
-    bool IsEnPassantCapture() { return (move_ & FLAGS_MASK) == 5; }
+    bool RemoveKingSideCastlingRights() { return (move_ & SPECIAL_1_MASK) == 2; }
+    bool RemoveQueenSideCastlingRights() { return (move_ & SPECIAL_1_2_MASK) == 3; }
+    bool IsEnPassantCapture() { return (move_ & EN_PASSANT_CAPTURE_MASK) == 5; }
     bool PromotePawnToQueen() { return (move_ & SPECIAL_1_2_MASK) == 3; }
     bool PromotePawnToRook() { return (move_ & SPECIAL_1_2_MASK) == 2; }
     bool PromotePawnToKnight() { return !(move_ & SPECIAL_1_2_MASK); }
