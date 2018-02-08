@@ -76,6 +76,7 @@ public:
     bool PromotePawnToKnight() { return !(move_ & SPECIAL_1_2_MASK); }
     bool PromotePawnToBishop() { return (move_ & SPECIAL_1_2_MASK) == 1; }
 
+    uint16_t GetMove() { return move_; }
     void PrintMove();
 };
 

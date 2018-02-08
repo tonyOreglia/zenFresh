@@ -39,7 +39,19 @@ TEST_CASE( "Validate starting position", "[position]" ) {
     }
 }
 
-TEST_CASE("Move class -- accessor and mutator functions") {
+TEST_CASE("Move class") {
+    SECTION("constructors") {
+        Move move;
+        REQUIRE(move.GetMove() == 0);
+        Move move2(0, 63);
+        REQUIRE(move2.GetMove() == 63*16);
+        Move move3(63, 0);
+        REQUIRE(move3.GetMove() == 63*32*32);
+        Move move4(62,63);
+        REQUIRE(move4.GetMove() == 63*16 + 62*32*32);
+        Move move5(move4.GetMove());
+        REQUIRE(move4.GetMove() == 63*16 + 62*32*32);
+    }
     SECTION("set and get origin square functions") {
         Move move;
         move.SetOriginSquare(1);
