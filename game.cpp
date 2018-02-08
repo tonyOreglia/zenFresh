@@ -64,8 +64,8 @@ void Game::GenerateRookMoves(vector <Move>& move_list) {
 
         while(valid_moves_bb) {
             PushSingleMoveFromValidMovesBBToMovesVector(rook_position, valid_moves_bb, move_list);
-            if (rook_position == 7 || rook_position == 63) move_list.back().SetRemoveKingSideCastleRightsFlag();
-            if (rook_position == 0 || rook_position == 56) move_list.back().SetRemoveQueenSideCastleRightsFlag();   
+            if (rook_position == 7 || rook_position == 63) move_list.back().SetKingSideCastleFlag();
+            if (rook_position == 0 || rook_position == 56) move_list.back().SetQueenSideCastleFlag();   
         }
     }
 }
@@ -111,8 +111,8 @@ void Game::GenerateKingMoves(vector <Move>& move_list) {
     valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
     while(valid_moves_bb) {
         PushSingleMoveFromValidMovesBBToMovesVector(king_position, valid_moves_bb, move_list); 
-        move_list.back().SetRemoveKingSideCastleRightsFlag();
-        move_list.back().SetRemoveQueenSideCastleRightsFlag();
+        move_list.back().SetKingSideCastleFlag();
+        move_list.back().SetQueenSideCastleFlag();
     }
 }
 

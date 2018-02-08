@@ -11,8 +11,8 @@
 #include "move.h"
 #include "./bitboard_utilities/generate-bitboard-lookup-tables.h"
 
-#define WHITE 1
-#define BLACK 0
+#define WHITE true
+#define BLACK false
 #define KING_SIDE_CASTLE 0
 #define QUEEN_SIDE_CASTLE 1
 

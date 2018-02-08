@@ -49,13 +49,14 @@ public:
     Move() { move_ = 0; }
     Move(uint16_t move) { move_ = move; }
     Move(short origin, short destination) { move_ = origin << 10 | destination << 4; }
+    void PrintMoveInBinary() {cout << bitset<16>(move_);}
     void SetOriginSquare(uint8_t origin) { move_ |= (origin << 10); }
     void SetDestinationSquare(uint8_t destination) { move_ |= (destination << 4); }
     void SetDoublePawnPushFlag() { move_ |= SPECIAL_2_MASK; }
     void SetCaptureFlag() { move_ |= CAPTURE_MASK; }
     void SetPromotionFlag() { move_ |= PROMOTION_MASK; }
-    void SetRemoveKingSideCastleRightsFlag() { move_ |= SPECIAL_1_MASK; }
-    void SetRemoveQueenSideCastleRightsFlag() { move_ |= SPECIAL_1_2_MASK; }
+    void SetKingSideCastleFlag() { move_ |= SPECIAL_1_MASK; }
+    void SetQueenSideCastleFlag() { move_ |= SPECIAL_1_2_MASK; }
     void SetEnPassantCaptureFlag() { move_ |=  EN_PASSANT_CAPTURE_MASK; }
     void SetPromotionPieceToQueen() { move_ |=  SPECIAL_1_2_MASK; }
     void SetPromotionPieceToRook() { move_ |= SPECIAL_1_MASK; }
@@ -67,8 +68,8 @@ public:
     bool IsDoublePawnPush() { return (move_ & FLAGS_MASK) == 1; }
     bool IsCapture() { return (bool)(move_ & CAPTURE_MASK); }
     bool IsPromotion() { return  (bool)(move_ & PROMOTION_MASK); }
-    bool RemoveKingSideCastlingRights() { return (move_ & SPECIAL_1_MASK) == 2; }
-    bool RemoveQueenSideCastlingRights() { return (move_ & SPECIAL_1_2_MASK) == 3; }
+    bool IsKingSideCastle() { return (move_ & SPECIAL_1_2_MASK) == 2; }
+    bool IsQueenSideCastle() { return (move_ & SPECIAL_1_2_MASK) == 3; }
     bool IsEnPassantCapture() { return (move_ & EN_PASSANT_CAPTURE_MASK) == 5; }
     bool PromotePawnToQueen() { return (move_ & SPECIAL_1_2_MASK) == 3; }
     bool PromotePawnToRook() { return (move_ & SPECIAL_1_2_MASK) == 2; }

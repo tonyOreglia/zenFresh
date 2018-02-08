@@ -38,8 +38,12 @@ Position::Position(char *fen, char *side_to_move, char *castling_rights, char *e
 
     UpdateAggregateBitboardsFromPieceBitboards();
 
-    if(side_to_move[0] == 'w') SetSideToMove(WHITE);
-    else if(side_to_move[0] == 'b') SetSideToMove(BLACK);
+    if(side_to_move[0] == 'w') { 
+        SetSideToMove(WHITE);
+    }
+    else if(side_to_move[0] == 'b') {
+        SetSideToMove(BLACK);
+    }
 
     for(char i=0; i<strlen(castling_rights); i++) {
         char letter = castling_rights[i];
@@ -219,12 +223,12 @@ void Position::MakeMove(Move& move) {
             ToggleBitboardBits(bitboard_.piece_bitboards[side_to_move_].bishops, destination_bitboard);
         }
     }
-
-    if (move.RemoveKingSideCastlingRights()) {
+    if (move.IsKingSideCastle()) {
         castling_rights_[side_to_move_][KING_SIDE_CASTLE] = false;
-    } else if (move.RemoveQueenSideCastlingRights()) {
+    } else if (move.IsQueenSideCastle()) {
         castling_rights_[side_to_move_][QUEEN_SIDE_CASTLE] = false;
     }
+    side_to_move_ = !side_to_move_;
 }
 
 void Position::UnmakeMove(Move& move) {

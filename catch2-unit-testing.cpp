@@ -34,6 +34,9 @@ TEST_CASE( "Validate starting position", "[position]" ) {
         game.GenerateMoves(moves_list);
         REQUIRE( moves_list.size() == 20 );
     }
+    SECTION("Position class accessor functions") {
+
+    }
 }
 
 TEST_CASE("Move class -- accessor and mutator functions") {
@@ -68,12 +71,13 @@ TEST_CASE("Move class -- accessor and mutator functions") {
         Move move2;
         REQUIRE(!!move2.IsPromotion() == false);
     }
-    SECTION("remove castling flags") {
+    SECTION("castling flags") {
         Move move;
-        move.SetRemoveKingSideCastleRightsFlag();
-        move.SetRemoveQueenSideCastleRightsFlag();
-        REQUIRE(move.RemoveKingSideCastlingRights() == true);
-        REQUIRE(move.RemoveQueenSideCastlingRights() == true);
+        REQUIRE(move.IsKingSideCastle() == false);
+        REQUIRE(move.IsQueenSideCastle() == false);
+        move.SetKingSideCastleFlag();
+        REQUIRE(move.IsKingSideCastle() == true);
+        REQUIRE(move.IsQueenSideCastle() == false);
     }
     SECTION("en passant capture flag") {
         Move move;
@@ -117,6 +121,13 @@ TEST_CASE("Basic Rook Movement", "[movement]") {
         vector <Move> moves_list = game.GetMovesVector(0);
         game.GenerateMoves(moves_list);
         REQUIRE( moves_list.size() == 11 );
+    }
+    SECTION("side to move is set correctly") {
+        Position pos;
+        REQUIRE(pos.GetSideToMove() == true);
+        Move move(55, 47);
+        pos.MakeMove(move);
+        REQUIRE(pos.GetSideToMove() == false);
     }
 }
 

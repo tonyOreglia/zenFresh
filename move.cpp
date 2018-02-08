@@ -13,6 +13,6 @@ void Move::PrintMove() {
         if (PromotePawnToKnight()) cout << " to knight.\n";
         if (PromotePawnToBishop()) cout << " to bishop.\n";
     }
-    if (RemoveKingSideCastlingRights()) cout << "This move removes king side castling rights.\n";
-    if (RemoveQueenSideCastlingRights()) cout << "This move removes queen side castling rights.\n";
+    if (IsKingSideCastle()) cout << "This move removes king side castling rights.\n";
+    if (IsQueenSideCastle()) cout << "This move removes queen side castling rights.\n";
 }
