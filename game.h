@@ -22,9 +22,16 @@ public:
     void GenerateKnightMoves(vector <Move>& move_list);
     void GenerateKingMoves(vector <Move>& move_list);
     void GenerateQueenMoves(vector <Move>& move_list);
-    void GenerateWhitePawnMoves(vector <Move>& move_list);
-    void GenerateBlackPawnMoves(vector <Move>& move_list);
+    void GeneratePawnMoves(vector <Move>& move_list);
+    void AddPawnMoveToMoveList(
+        vector <Move>& move_list,
+        uint64_t &valid_moves_bb,
+        short originSquareDirectionAndDistanceFromDestination);
     void PushSingleMoveFromValidMovesBBToMovesVector(
+        short origin,
+        uint64_t &valid_moves_bb,
+        vector <Move>& move_list);
+    void PushValidMovesBBToMovesVector(
         short origin,
         uint64_t &valid_moves_bb,
         vector <Move>& move_list);
