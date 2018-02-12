@@ -116,9 +116,10 @@ void Game::AddPawnMoveToMoveList(
     }
 
 /**
+ * INCOMPLETE FUNCTION
  * Generate valid pawn moves. Special cases include:
- * - En passant captures
- * - Promotion moves
+ * - En passant captures [X]
+ * - Promotion moves [ ]
  * This function differs from other move generation functions in that it calculates for all pawns
  * in parallel, rather than each piece serially.
  **/
@@ -144,14 +145,18 @@ void Game::GeneratePawnMoves(vector <Move>& move_list) {
         valid_pawn_attacks_shift_nine = (pawn_bb_copy & ~a_file) << 9;
         multiplier = -1;
     }
-    valid_double_push_pawn_moves_bb &= ~position.GetAllOccupiedSquaresBitBoard();
+
     while(valid_single_push_moves_bb) {
+        // need to handle promotion logic here.
         AddPawnMoveToMoveList(move_list, valid_single_push_moves_bb, 8 * multiplier);
     }
+
+    valid_double_push_pawn_moves_bb &= ~position.GetAllOccupiedSquaresBitBoard();
     while(valid_double_push_pawn_moves_bb) {
         AddPawnMoveToMoveList(move_list, valid_double_push_pawn_moves_bb, 16 * multiplier);
         move_list.back().SetDoublePawnPushFlag();
     }
+
     uint64_t squares_pawns_can_attack =
         position.GetOccupiedSquaresBitBoard(!position.GetSideToMove()) | position.GetEnPassanteBitBoard();
     valid_pawn_attacks_shift_seven &= squares_pawns_can_attack;
