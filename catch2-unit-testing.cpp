@@ -263,6 +263,33 @@ TEST_CASE("Basic Pawn Movement", "[movement]") {
     SECTION("En passant square is 16") {
         REQUIRE(lsb_scan(position.GetEnPassanteBitBoard()) == 16);
     }
+    SECTION("Promotion") {
+        Position position(
+            (char *)"8/7P/8/8/8/8/8/k6K",
+            (char *)"w",
+            (char *)"----",
+            (char *)"-",
+            (char *)"1",
+            (char *)"1"
+        );
+        Game game(position);
+        vector <Move> moves_list = game.GetMovesVector(0);
+        game.GenerateMoves(moves_list);
+        REQUIRE(moves_list.size() == 7);
+
+        position = *(new Position(
+            (char *)"k6K/8/8/8/8/8/7p/8",
+            (char *)"b",
+            (char *)"----",
+            (char *)"-",
+            (char *)"1",
+            (char *)"1"
+        ));
+        game = *(new Game(position));
+        moves_list = game.GetMovesVector(0);
+        game.GenerateMoves(moves_list);
+        REQUIRE(moves_list.size() == 7);
+    }
 }
 /**
  * Things I can test

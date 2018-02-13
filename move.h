@@ -60,7 +60,7 @@ public:
     void SetEnPassantCaptureFlag() { move_ |=  EN_PASSANT_CAPTURE_MASK; }
     void SetPromotionPieceToQueen() { move_ |=  SPECIAL_1_2_MASK; }
     void SetPromotionPieceToRook() { move_ |= SPECIAL_1_MASK; }
-    void SetPromotionPieceToKnight() {;} // nothing to be done
+    void SetPromotionPieceToKnight() { move_ &= ~SPECIAL_1_2_MASK; }
     void SetPromotionPieceToBishop() { move_ |= SPECIAL_2_MASK; }
 
     uint16_t GetOriginSquare() { return move_ >> 10; }

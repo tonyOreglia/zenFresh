@@ -88,8 +88,78 @@ void Game::GenerateKnightMoves(vector <Move>& move_list) {
     }
 }
 
+bool Game::CheckIfAnyMoveAttacksSpecificLocation(short square_to_check) {
+    vector <Move> move_list;
+    position.ToggleSideToMove();
+    GenerateMoves(move_list);
+    position.ToggleSideToMove();
+    for(vector<Move>::iterator move_ptr = move_list.begin(); move_ptr != move_list.end(); ++move_ptr) {
+        if (move_ptr->GetDestinationSquare() == square_to_check) {
+            return true;
+        }
+    }
+    return false;
+}
 /**
- * FUNCTION INCOMPLETE
+ * INCOMPLETE FUNCTION
+ * Checks for: 
+ * - There are no pieces on destination position [X]
+ * - There are no pieces on square that king slides across [X]
+ * - King does not move through check [X]
+ * - position castling rights flags allow the castle [X]
+ */
+bool Game::CheckIfCastlingMoveIsValid(Move move) {
+    vector <Move> move_list;
+    short destination_sq = move.GetDestinationSquare();
+    uint64_t destination_bb = single_index_bitboard_[destination_sq];
+    uint64_t square_king_moves_across_bb;
+    if (destination_bb & position.GetAllOccupiedSquaresBitBoard()) {
+        return false;
+    }
+    if (destination_sq == BLACK_QUEEN_SIDE_CASTLE_DESTINATION) {
+        if (!position.BlackCanCastleQueenSide()) return false;
+        if (CheckIfAnyMoveAttacksSpecificLocation(BLACK_QUEEN_SIDE_CASTLE_DESTINATION)) {
+            return false;
+        }
+        if (CheckIfAnyMoveAttacksSpecificLocation(BLACK_QUEEN_SIDE_CASTLE_SLIDE_ACROSS_SQUARE)) {
+            return false;
+        }
+        square_king_moves_across_bb = single_index_bitboard_[BLACK_QUEEN_SIDE_CASTLE_SLIDE_ACROSS_SQUARE];
+    } else if (destination_sq == BLACK_KING_SIDE_CASTLE_DESTINATION) {
+        if (!position.BlackCanCastleKingSide()) return false;
+        if (CheckIfAnyMoveAttacksSpecificLocation(BLACK_KING_SIDE_CASTLE_DESTINATION)) {
+            return false;
+        }
+        if (CheckIfAnyMoveAttacksSpecificLocation(BLACK_KING_SIDE_CASTLE_SLIDE_ACROSS_SQUARE)) {
+            return false;
+        }
+        square_king_moves_across_bb = single_index_bitboard_[BLACK_KING_SIDE_CASTLE_SLIDE_ACROSS_SQUARE]; 
+    } else if (destination_sq == WHITE_KING_SIDE_CASTLE_DESTINATION) {
+        if (!position.WhiteCanCastleKingSide()) return false;
+        if (CheckIfAnyMoveAttacksSpecificLocation(WHITE_KING_SIDE_CASTLE_DESTINATION)) {
+            return false;
+        }
+        if (CheckIfAnyMoveAttacksSpecificLocation(WHITE_KING_SIDE_CASTLE_SLIDE_ACROSS_SQUARE)) {
+            return false;
+        }
+        square_king_moves_across_bb = single_index_bitboard_[WHITE_KING_SIDE_CASTLE_SLIDE_ACROSS_SQUARE];
+    } else if (destination_sq == WHITE_QUEEN_SIDE_CASTLE_DESTINATION) {
+        if (!position.WhiteCanCastleQueenSide()) return false;
+        if (CheckIfAnyMoveAttacksSpecificLocation(WHITE_QUEEN_SIDE_CASTLE_DESTINATION)) {
+            return false;
+        }
+        if (CheckIfAnyMoveAttacksSpecificLocation(WHITE_QUEEN_SIDE_CASTLE_SLIDE_ACROSS_SQUARE)) {
+            return false;
+        }
+        square_king_moves_across_bb = single_index_bitboard_[WHITE_QUEEN_SIDE_CASTLE_SLIDE_ACROSS_SQUARE];
+    }
+    if (square_king_moves_across_bb & position.GetAllOccupiedSquaresBitBoard()) {
+            return false;
+        }
+    return true;
+}
+
+/**
  * Generate valid King moves including castling. Castling moves must check for:
  * - Does not move King through an attack
  * - Position castling permission flags allow the castle
@@ -101,25 +171,52 @@ void Game::GenerateKingMoves(vector <Move>& move_list) {
     uint64_t valid_moves_bb =
         king_move_bitboard_lookup[position.GetSideToMove()][king_position];
     valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
-    PushValidMovesBBToMovesVector(king_position, valid_moves_bb, move_list);
+    while (valid_moves_bb) {
+        PushSingleMoveFromValidMovesBBToMovesVector(king_position, valid_moves_bb, move_list);
+
+        if (move_list.back().GetDestinationSquare() == move_list.back().GetOriginSquare() + 2 ||
+        move_list.back().GetDestinationSquare() == move_list.back().GetOriginSquare() - 2) {
+            // check that casle does not move through check somehow
+            // check that position castling permissions are OK
+            // check that the path is clear
+        }
+    }
 }
 
 void Game::AddPawnMoveToMoveList(
     vector <Move>& move_list,
     uint64_t &valid_single_push_moves_bb,
     short originSquareDirectionAndDistanceFromDestination
-    ) {
-        uint8_t destination_position = lsb_scan(valid_single_push_moves_bb);
-        valid_single_push_moves_bb ^= single_index_bitboard_[destination_position];
-        Move move(destination_position + originSquareDirectionAndDistanceFromDestination, destination_position);
-        move_list.push_back(move);
-    }
+) {
+    uint8_t destination_position = lsb_scan(valid_single_push_moves_bb);
+    valid_single_push_moves_bb ^= single_index_bitboard_[destination_position];
+    Move move(destination_position + originSquareDirectionAndDistanceFromDestination, destination_position);
+    move_list.push_back(move);
+}
+
+void Game::AddPawnPromotionMovesToMoveList(vector <Move>& move_list) {
+    short destination_sq = move_list.back().GetDestinationSquare();
+    short origin_sq = move_list.back().GetOriginSquare();
+    Move *move = new Move(origin_sq, destination_sq);
+    move_list.back().SetPromotionFlag();
+    move_list.back().SetPromotionPieceToBishop();
+    move_list.push_back(*move);
+    move_list.back().SetPromotionFlag();
+    move_list.back().SetPromotionPieceToRook();
+    move = new Move(origin_sq, destination_sq);
+    move_list.push_back(*move);
+    move_list.back().SetPromotionFlag();
+    move_list.back().SetPromotionPieceToKnight();
+    move = new Move(origin_sq, destination_sq);
+    move_list.push_back(*move);
+    move_list.back().SetPromotionFlag();
+    move_list.back().SetPromotionPieceToQueen();
+}
 
 /**
- * INCOMPLETE FUNCTION
  * Generate valid pawn moves. Special cases include:
  * - En passant captures [X]
- * - Promotion moves [ ]
+ * - Promotion moves [X]
  * This function differs from other move generation functions in that it calculates for all pawns
  * in parallel, rather than each piece serially.
  **/
@@ -149,6 +246,10 @@ void Game::GeneratePawnMoves(vector <Move>& move_list) {
     while(valid_single_push_moves_bb) {
         // need to handle promotion logic here.
         AddPawnMoveToMoveList(move_list, valid_single_push_moves_bb, 8 * multiplier);
+        short destination_sq = move_list.back().GetDestinationSquare();
+        if (destination_sq < 8 || destination_sq > 55) {
+            AddPawnPromotionMovesToMoveList(move_list);
+        }
     }
 
     valid_double_push_pawn_moves_bb &= ~position.GetAllOccupiedSquaresBitBoard();

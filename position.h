@@ -104,6 +104,7 @@ public:
     
     bool GetSideToMove() {return side_to_move_;}
     void SetSideToMove(bool side_to_move) { side_to_move_ = side_to_move; }
+    void ToggleSideToMove() { side_to_move_ = !side_to_move_; }
     uint8_t GetHalfMoveCount() {return half_move_count_;}
     short int GetFullMoveCount() {return full_move_count_;}
 

@@ -10,6 +10,16 @@
 
 #define DEPTH 8
 #define MAX_MOVES_FROM_SINGLE_POSITION 100
+#define WHITE_KING_SIDE_CASTLE_DESTINATION 62
+#define WHITE_KING_SIDE_CASTLE_SLIDE_ACROSS_SQUARE 61
+#define WHITE_QUEEN_SIDE_CASTLE_DESTINATION 58
+#define WHITE_QUEEN_SIDE_CASTLE_SLIDE_ACROSS_SQUARE 59
+#define BLACK_KING_SIDE_CASTLE_DESTINATION 6
+#define BLACK_KING_SIDE_CASTLE_SLIDE_ACROSS_SQUARE 5
+#define BLACK_QUEEN_SIDE_CASTLE_DESTINATION 2
+#define BLACK_QUEEN_SIDE_CASTLE_SLIDE_ACROSS_SQUARE 3
+
+
 
 using namespace std; 
 
@@ -21,6 +31,8 @@ public:
     void GenerateBishopMoves(vector <Move>& move_list);
     void GenerateKnightMoves(vector <Move>& move_list);
     void GenerateKingMoves(vector <Move>& move_list);
+    bool CheckIfCastlingMoveIsValid(Move move);
+    bool CheckIfAnyMoveAttacksSpecificLocation(short square_to_check);
     void GenerateQueenMoves(vector <Move>& move_list);
     void GeneratePawnMoves(vector <Move>& move_list);
     void AddPawnMoveToMoveList(
@@ -31,6 +43,7 @@ public:
         short origin,
         uint64_t &valid_moves_bb,
         vector <Move>& move_list);
+    void AddPawnPromotionMovesToMoveList(vector <Move>& move_list);
     void PushValidMovesBBToMovesVector(
         short origin,
         uint64_t &valid_moves_bb,

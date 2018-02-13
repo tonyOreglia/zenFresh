@@ -76,10 +76,10 @@ int main(int argc, char *argv[]) {
     calculateAllLookupBbs();
 
     Position position(
-            (char *)"k7/8/8/1P6/8/3r1R2/P1PPPPPP/7K",
+            (char *)"8/7P/8/8/8/8/8/k6K",
             (char *)"w",
             (char *)"----",
-            (char *)"a6",
+            (char *)"-",
             (char *)"1",
             (char *)"1"
         );
