@@ -90,9 +90,15 @@ void Game::GenerateKnightMoves(vector <Move>& move_list) {
 
 bool Game::CheckIfAnyMoveAttacksSpecificLocation(short square_to_check) {
     vector <Move> move_list;
+    Position temp;
+    temp  = position;
     position.ToggleSideToMove();
+    position.SetBlackCanCastleKingSide(false);
+    position.SetBlackCanCastleQueenSide(false);
+    position.SetWhiteCanCastleKingSide(false);
+    position.SetWhiteCanCastleQueenSide(false);
     GenerateMoves(move_list);
-    position.ToggleSideToMove();
+    position = temp;
     for(vector<Move>::iterator move_ptr = move_list.begin(); move_ptr != move_list.end(); ++move_ptr) {
         if (move_ptr->GetDestinationSquare() == square_to_check) {
             return true;
@@ -176,9 +182,7 @@ void Game::GenerateKingMoves(vector <Move>& move_list) {
 
         if (move_list.back().GetDestinationSquare() == move_list.back().GetOriginSquare() + 2 ||
         move_list.back().GetDestinationSquare() == move_list.back().GetOriginSquare() - 2) {
-            // check that casle does not move through check somehow
-            // check that position castling permissions are OK
-            // check that the path is clear
+            if (!CheckIfCastlingMoveIsValid(move_list.back())) move_list.pop_back();
         }
     }
 }
