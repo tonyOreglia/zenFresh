@@ -224,7 +224,7 @@ TEST_CASE("Basic King Movement", "[movement]") {
         game.GenerateMoves(moves_list);
         REQUIRE( moves_list.size() == 7 );
     }
-    SECTION("Cannot castle into check") {
+    SECTION("White cannot castle kingside into check") {
         Position position(
             (char *)"4k3/8/8/8/8/8/6r1/4K3",
             (char *)"w",
@@ -237,6 +237,34 @@ TEST_CASE("Basic King Movement", "[movement]") {
         vector <Move> moves_list = game.GetMovesVector(0);
         game.GenerateMoves(moves_list);
         REQUIRE( moves_list.size() == 6 );
+    }
+    SECTION("White cannot castle kingside through check") {
+        Position position(
+            (char *)"4k3/8/8/8/8/8/5r2/4K3",
+            (char *)"w",
+            (char *)"KQkq",
+            (char *)"-",
+            (char *)"1",
+            (char *)"1"
+        );
+        Game game(position);
+        vector <Move> moves_list = game.GetMovesVector(0);
+        game.GenerateMoves(moves_list);
+        REQUIRE( moves_list.size() == 6 );
+    }
+    SECTION("White cannot castle if flags do not allow it") {
+        Position position(
+            (char *)"4k3/8/8/8/8/8/5r2/4K3",
+            (char *)"w",
+            (char *)"----",
+            (char *)"-",
+            (char *)"1",
+            (char *)"1"
+        );
+        Game game(position);
+        vector <Move> moves_list = game.GetMovesVector(0);
+        game.GenerateMoves(moves_list);
+        REQUIRE( moves_list.size() == 5 );
     }
 }
 
