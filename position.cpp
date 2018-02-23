@@ -228,7 +228,7 @@ void Position::MakeMove(Move& move) {
     } else if (move.IsQueenSideCastle()) {
         castling_rights_[side_to_move_][QUEEN_SIDE_CASTLE] = false;
     }
-    side_to_move_ = !side_to_move_;
+    ToggleSideToMove();
 }
 
 void Position::UnmakeMove(Move& move) {
