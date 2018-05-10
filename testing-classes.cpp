@@ -7,7 +7,6 @@
 #include "./bitboard_utilities/bitboard-utilities.h"
 #include "./bitboard_utilities/generate-bitboard-lookup-tables.h"
 
-
 using namespace std;
 
 void PrintBitBoard(uint64_t bitboard);

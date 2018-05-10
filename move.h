@@ -29,7 +29,7 @@ private:
                double pawn push, and en passant capture.
     Bits 12-15:
      * promotion | capture | special 1 | special 2
-     * 0 | 0 | 0 | 0 - quiet move_s
+     * 0 | 0 | 0 | 0 - quiet move
      * 0 | 0 | 0 | 1 - double pawn push
      * 0 | 0 | 1 | 0 - king side castle
      * 0 | 0 | 1 | 1 - queen side castle

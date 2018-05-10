@@ -174,12 +174,10 @@ bool Game::CheckIfCastlingMoveIsValid(Move move) {
 void Game::GenerateKingMoves(vector <Move>& move_list) {
     uint64_t king_bb_copy = position.GetKingBitBoard();
     uint8_t king_position = lsb_scan(king_bb_copy);
-    uint64_t valid_moves_bb =
-        king_move_bitboard_lookup[position.GetSideToMove()][king_position];
+    uint64_t valid_moves_bb = king_move_bitboard_lookup[position.GetSideToMove()][king_position];
     valid_moves_bb &= ~position.GetActiveSidesOccupiedSquaresBB();
     while (valid_moves_bb) {
         PushSingleMoveFromValidMovesBBToMovesVector(king_position, valid_moves_bb, move_list);
-
         if (move_list.back().GetDestinationSquare() == move_list.back().GetOriginSquare() + 2 ||
         move_list.back().GetDestinationSquare() == move_list.back().GetOriginSquare() - 2) {
             if (!CheckIfCastlingMoveIsValid(move_list.back())) move_list.pop_back();
@@ -223,6 +221,7 @@ void Game::AddPawnPromotionMovesToMoveList(vector <Move>& move_list) {
  * - Promotion moves [X]
  * This function differs from other move generation functions in that it calculates for all pawns
  * in parallel, rather than each piece serially.
+ * To do: split this up into multiple smaller functions.
  **/
 void Game::GeneratePawnMoves(vector <Move>& move_list) {
     uint64_t pawn_bb_copy = position.GetPawnsBitBoard();
@@ -392,12 +391,12 @@ uint64_t Game::GenerateValidStraightSlidingMovesBB(char index) {
             GenerateValidMovesWestBitboard(index));
 }
 
-// uint64_t Game::PerformanceTest(short depth) {
-//     short current_depth = 0;
-//     uint64_t total_number_of_potential_moves = 0ULL;
-//     while (current_depth < depth) {
-//         GenerateMoves(potential_moves_[current_depth]);
-//         total_number_of_potential_moves += potential_moves_[current_depth].size();
-//         current_depth++;
-//     }
-// }
+uint64_t Game::PerformanceTest(short depth) {
+    short current_depth = 0;
+    uint64_t total_number_of_potential_moves = 0ULL;
+    while (current_depth < depth) {
+        GenerateMoves(potential_moves_[current_depth]);
+        total_number_of_potential_moves += potential_moves_[current_depth].size();
+        current_depth++;
+    }
+}

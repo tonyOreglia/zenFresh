@@ -31,7 +31,7 @@ enum {
 
 /**
  * Store all information associated with a single chess position.
-*/
+ */
 class Position
 {
 private:
@@ -64,8 +64,8 @@ public:
     void SetStartingPosition();
     void ClearPosition();
     void MakeMove(Move& move);
-    void UpdateMovingPieceBitboardWithSingleMove(uint64_t origin_bitboard, uint64_t destination_bitboard);
     void UnmakeMove(Move& move);
+    void UpdateMovingPieceBitboardWithSingleMove(uint64_t origin_bitboard, uint64_t destination_bitboard);
     uint64_t* GetPieceBitboardBasedOnBoardLocation(uint64_t board_location_bitboard, bool side_to_check);
     void ToggleBitboardBits(uint64_t& piece_bitboard, uint64_t toggle_positions);
 

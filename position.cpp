@@ -232,7 +232,16 @@ void Position::MakeMove(Move& move) {
 }
 
 void Position::UnmakeMove(Move& move) {
-
+    /** This function needs to 
+     * - move piece from destination to origin sq
+     *      in move object
+     * - Replace piece if move was an attack
+     *      attack flag in move object. Attacked piece is in 
+     * - change back castling rights if they were changed
+     * - Set en passante square if previous move was a double pawn push
+     * - change piece back to pawn if move was a promotion
+     * 
+     */ 
 }
 
 /**

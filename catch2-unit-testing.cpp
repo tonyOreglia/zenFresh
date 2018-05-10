@@ -44,13 +44,13 @@ TEST_CASE("Move class") {
         Move move;
         REQUIRE(move.GetMove() == 0);
         Move move2(0, 63);
-        REQUIRE(move2.GetMove() == 63*16);
+        REQUIRE(move2.GetMove() == 1008);
         Move move3(63, 0);
-        REQUIRE(move3.GetMove() == 63*32*32);
+        REQUIRE(move3.GetMove() == 64512);
         Move move4(62,63);
-        REQUIRE(move4.GetMove() == 63*16 + 62*32*32);
+        REQUIRE(move4.GetMove() == 64496);
         Move move5(move4.GetMove());
-        REQUIRE(move4.GetMove() == 63*16 + 62*32*32);
+        REQUIRE(move4.GetMove() == 64496);
     }
     SECTION("set and get origin square functions") {
         Move move;
@@ -90,31 +90,47 @@ TEST_CASE("Move class") {
         move.SetKingSideCastleFlag();
         REQUIRE(move.IsKingSideCastle() == true);
         REQUIRE(move.IsQueenSideCastle() == false);
+        move.SetQueenSideCastleFlag();
+        REQUIRE(move.IsQueenSideCastle() == true);
+        
     }
     SECTION("en passant capture flag") {
         Move move;
+        REQUIRE(move.IsEnPassantCapture() == false);
         move.SetEnPassantCaptureFlag();
         REQUIRE(move.IsEnPassantCapture() == true);
     }
-    SECTION("promot pawn to queen") {
+    SECTION("promote pawn to queen") {
         Move move;
         move.SetPromotionPieceToQueen();
         REQUIRE(move.PromotePawnToQueen() == true);
+        REQUIRE(move.PromotePawnToRook() == false);
+        REQUIRE(move.PromotePawnToKnight() == false);
+        REQUIRE(move.PromotePawnToBishop() == false);
     }
     SECTION("promote pawn to rook") {
         Move move;
         move.SetPromotionPieceToRook();
         REQUIRE(move.PromotePawnToRook() == true);
+        REQUIRE(move.PromotePawnToQueen() == false);
+        REQUIRE(move.PromotePawnToKnight() == false);
+        REQUIRE(move.PromotePawnToBishop() == false);
     }
     SECTION("promote pawn to knight") {
         Move move;
         move.SetPromotionPieceToKnight();
         REQUIRE(move.PromotePawnToKnight() == true);
+        REQUIRE(move.PromotePawnToRook() == false);
+        REQUIRE(move.PromotePawnToQueen() == false);
+        REQUIRE(move.PromotePawnToBishop() == false);
     }
     SECTION("promote pawn to bishop") {
         Move move;
         move.SetPromotionPieceToBishop();
         REQUIRE(move.PromotePawnToBishop() == true);
+        REQUIRE(move.PromotePawnToRook() == false);
+        REQUIRE(move.PromotePawnToQueen() == false);
+        REQUIRE(move.PromotePawnToKnight() == false);
     }
 }
 
@@ -218,6 +234,16 @@ TEST_CASE("Basic King Movement", "[movement]") {
         (char *)"1",
         (char *)"1"
     );
+    /**
+     * ****k***
+     * ********
+     * ********
+     * ********
+     * ********
+     * ********
+     * ********
+     * ****K***
+     */ 
     SECTION("Castling Moves for black") {
         Game game(position3);
         vector <Move> moves_list = game.GetMovesVector(0);
@@ -233,6 +259,16 @@ TEST_CASE("Basic King Movement", "[movement]") {
             (char *)"1",
             (char *)"1"
         );
+      /**
+       * ****k***
+       * ********
+       * ********
+       * ********
+       * ********
+       * ********
+       * ********
+       * ****K***
+       */ 
         Game game(position);
         vector <Move> moves_list = game.GetMovesVector(0);
         game.GenerateMoves(moves_list);

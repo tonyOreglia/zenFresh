@@ -19,8 +19,6 @@
 #define BLACK_QUEEN_SIDE_CASTLE_DESTINATION 2
 #define BLACK_QUEEN_SIDE_CASTLE_SLIDE_ACROSS_SQUARE 3
 
-
-
 using namespace std; 
 
 class Game {
@@ -35,19 +33,10 @@ public:
     bool CheckIfAnyMoveAttacksSpecificLocation(short square_to_check);
     void GenerateQueenMoves(vector <Move>& move_list);
     void GeneratePawnMoves(vector <Move>& move_list);
-    void AddPawnMoveToMoveList(
-        vector <Move>& move_list,
-        uint64_t &valid_moves_bb,
-        short originSquareDirectionAndDistanceFromDestination);
-    void PushSingleMoveFromValidMovesBBToMovesVector(
-        short origin,
-        uint64_t &valid_moves_bb,
-        vector <Move>& move_list);
+    void AddPawnMoveToMoveList(vector <Move>& move_list, uint64_t &valid_moves_bb, short originSquareDirectionAndDistanceFromDestination);
+    void PushSingleMoveFromValidMovesBBToMovesVector(short origin, uint64_t &valid_moves_bb, vector <Move>& move_list);
     void AddPawnPromotionMovesToMoveList(vector <Move>& move_list);
-    void PushValidMovesBBToMovesVector(
-        short origin,
-        uint64_t &valid_moves_bb,
-        vector <Move>& move_list);
+    void PushValidMovesBBToMovesVector(short origin, uint64_t &valid_moves_bb, vector <Move>& move_list);
     uint64_t GenerateValidMovesNorthBitboard(char index);
     uint64_t GenerateValidMovesEastBitboard(char index);
     uint64_t GenerateValidMovesSouthBitboard(char index);
@@ -62,9 +51,6 @@ public:
     vector <Move> &GetMovesVector(short depth) { return potential_moves_[depth]; }
 private:
     Position position;
-    // there is something wrong with this and it is causing the a_file bb to be funky as shit.
-    // out of scope????
-    // BitBoardLookupTables &bitboard_lookup_;
     vector <Move> game_history;
     vector <Move> *potential_moves_;
 };
