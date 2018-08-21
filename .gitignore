@@ -2,3 +2,4 @@
 *.o
 zen
 test
+.vscode/*
